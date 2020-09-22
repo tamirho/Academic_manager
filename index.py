@@ -35,11 +35,11 @@ def login():
         session["user_name"] = user_name
         session["active"] = True
         session["type"] = "student"
-        flash("Logged in successfully!", "info")
+        flash("Logged in successfully!", "success")
         return redirect(url_for("user"))
     else:
         if "user_name" in session:
-            flash("Already logged in!", "info")
+            flash("Already logged in!", "warning")
             return redirect(url_for("user"))
         return render_template("login.html")
 
@@ -55,7 +55,7 @@ def sign_up():
         session["user_name"] = user_name  # todo crate a function to activate and deactivate session
         session["active"] = True
         session["type"] = user_type
-        flash("Sign up successfully!", "info")
+        flash("Sign up successfully!", "success")
         return redirect(url_for("user"))
     else:
         return render_template("sign_up.html")
@@ -71,7 +71,7 @@ def user():
         else:
             return redirect(url_for("student"))
     else:
-        flash("You need to login first", "info")
+        flash("You need to login first", "danger")
         return redirect(url_for("home"))
 
 
@@ -79,7 +79,7 @@ def user():
 def logout():
     if "user_name" in session:
         user_name = session["user_name"]
-        flash(f"{user_name}, you logged out successfully!", "info")
+        flash(f"{user_name}, you logged out successfully!", "success")
     session.pop("user_name", None)
     session.pop("active", None)
     session.pop("type", None)

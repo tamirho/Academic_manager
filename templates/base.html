@@ -48,22 +48,22 @@
             </ul>
         </div>
     </nav>
+    </br>
+    <div class="col-sm-12">
+        <div class="card">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
 
-
-    {% block content %}{% endblock %}
-
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <strong>info:</strong>
-                <ul>
-                {% for msg in messages %}
-                    <li>{{msg}}</li>
+                {% for category, msg in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <strong>info: </strong>{{msg}}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                    </div>
                 {% endfor %}
-                </ul>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span></button>
-            </div>
         {% endif %}
     {% endwith %}
 
