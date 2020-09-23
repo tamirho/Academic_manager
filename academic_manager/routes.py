@@ -1,6 +1,5 @@
 from flask import redirect, url_for, render_template, request, session, flash
 from academic_manager import app, db
-from academic_manager.models import Student
 from academic_manager.form_validation import *
 
 
@@ -9,19 +8,23 @@ def home():
     return render_template("home.html")
 
 
-@app.route("/admin/")
+@app.route("/admin/", methods=['POST', 'GET'])
 def admin():
-    return render_template("admin.html")
+    student_list = Student.query.all()
+    teacher_list = Teacher.query.all()
+    return render_template("admin.html", student_list=student_list, teacher_list=teacher_list)
 
 
 @app.route("/teacher/")
 def teacher():
-    return render_template("teacher.html")
+    teacher_profile = Teacher.query.filter_by(user_name=session["user_name"]).first()
+    return render_template("teacher.html", teacher=teacher_profile)
 
 
 @app.route("/student/")
 def student():
-    return render_template("student.html")
+    student_profile = Student.query.filter_by(user_name=session["user_name"]).first()
+    return render_template("student.html", student=student_profile)
 
 
 @app.route("/login/", methods=['POST', 'GET'])
@@ -30,10 +33,15 @@ def login():
         session.permanent = True
         user_name = request.form["user_name"]
         user_password = request.form["user_password"]
-        session["user_name"] = user_name
-        session["type"] = "student"
-        flash("Logged in successfully!", "success")
-        return redirect(url_for("user"))
+        user_type = user_authentication(user_name, user_password)
+        if not user_type == "none":
+            session["user_name"] = user_name
+            session["type"] = user_type
+            flash("Logged in successfully!", "success")
+            return redirect(url_for("user"))
+        else:
+            flash("The username or password is invalid", "danger")
+            return redirect(url_for("login"))
     else:
         if "user_name" in session:
             flash("Already logged in!", "warning")
@@ -45,37 +53,37 @@ def login():
 def sign_up():
     if request.method == "POST":
         user_name = request.form["user_name"]
-        user_email = request.form["user_email"]  # todo use regex to check the email
-        user_password = request.form["user_password"]  # todo create check pass function
+        user_email = request.form["user_email"]
+        user_password = request.form["user_password"]
         password_confirmation = request.form["password_confirmation"]
         user_type = request.form["user_type"]
-        check_flag, problem = sign_up_validation(user_name, user_email, user_password,
-                                                 password_confirmation, user_type)
+        check_flag, messages = sign_up_validation(user_name, user_email, user_password, password_confirmation)
         if check_flag:
-            session["user_name"] = user_name  # todo crate a function to activate and deactivate session
-            session["type"] = user_type
-
-            new_user = Student(user_name, user_email, user_password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash("Sign up successfully!", "success")
-            return redirect(url_for("user"))
+            make_new_user(user_name, user_email, user_password, user_type)
+            flash("Sign up successfully! you can login now", "info")
+            return redirect(url_for("login"))
         else:
-            flash(problem, "danger")
+            for message in messages:
+                flash(message, "danger")
             return redirect(url_for("sign_up"))
     else:
+        if "user_name" in session:
+            flash("Already logged in!", "warning")
+            return redirect(url_for("user"))
         return render_template("sign_up.html")
 
 
 @app.route("/user/")
 def user():
+
     if "type" in session:
+        user_name = session["user_name"]
         if session["type"] == "admin":
             return redirect(url_for("admin"))
         elif session["type"] == "teacher":
-            return redirect(url_for("teacher"))
+            return redirect(url_for("teacher", user_name=user_name))
         else:
-            return redirect(url_for("student"))
+            return redirect(url_for("student", user_name=user_name))
     else:
         flash("You need to login first", "danger")
         return redirect(url_for("home"))
@@ -86,6 +94,6 @@ def logout():
     if "user_name" in session:
         user_name = session["user_name"]
         flash(f"{user_name}, you logged out successfully!", "success")
-    session.pop("user_name", None)
-    session.pop("type", None)
+        session.pop("user_name", None)
+        session.pop("type", None)
     return redirect(url_for("home"))

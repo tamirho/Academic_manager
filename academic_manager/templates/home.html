@@ -4,7 +4,7 @@
 {% block content %}
 
 
-    {% if session["active"] %}
+    {% if session["type"] %}
     <h5 class="card-header">Welcome {{ session["user_name"] }}</h5>
     <div class="card-body">
         <h5 class="card-title">Special title treatment</h5>
