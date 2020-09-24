@@ -1,7 +1,7 @@
 from flask import redirect, url_for, render_template, request, session, flash
 from academic_manager import app, db
 from academic_manager.form_validation import *
-
+from academic_manager.admin_funcs import *
 
 @app.route("/")
 def home():
@@ -12,7 +12,26 @@ def home():
 def admin():
     student_list = Student.query.all()
     teacher_list = Teacher.query.all()
-    return render_template("admin.html", student_list=student_list, teacher_list=teacher_list)
+    courses_list = Course.query.all()
+    return render_template("admin.html", student_list=student_list, teacher_list=teacher_list,
+                           courses_list=courses_list)
+
+
+@app.route("/admin/add_course/", methods=['POST', 'GET'])
+def add_course():
+    if request.method == "POST":
+        course_name = request.form["course_name"]
+        teacher_name = request.form["teacher_name"]
+        if validate_course_name(course_name):
+            make_new_course_by_names(course_name, teacher_name)
+            flash("The course is added to the list", "success")
+            return redirect(url_for("admin"))
+        else:
+            flash("That Course name is invalid", "warning")
+            return redirect(url_for("add_course"))
+    else:
+        teacher_list = Teacher.query.all()
+        return render_template("add_course.html", teacher_list=teacher_list)
 
 
 @app.route("/teacher/")
