@@ -19,7 +19,8 @@
                 <td>{{ teacher.password }}</td>
                 <td>
                     <a href="#" class="badge badge-success">Update</a>
-                    <a href="#" class="badge badge-danger">Delete</a>
+                    <a href="{{ url_for('teachers.delete_teacher', teacher_id=teacher.id) }}"
+                       class="badge badge-danger">Delete</a>
                 </td>
               </tr>
         </table>
@@ -29,6 +30,9 @@
             <ul>
                 {% for course in teacher.course %}
                     <li>{{ course.course_name }}</li>
+                    <a href="#" class="badge badge-success">Update</a>
+                    <a href="{{ url_for('courses.delete_course', course_id=course.id) }}"
+                       class="badge badge-danger">Delete</a>
                 {% endfor %}
             </ul>
         </div>
