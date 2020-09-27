@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+    {% block title %}Update {{ user.user_name }} Profile{% endblock %}
+{% block content %}
+    <h4 class="card-header">Update Profile</h4>
+    <div class="card-body">
+        <h5>User Details:</h5>
+
+        <form action="#" method="post">
+            <div class="form-group">
+                <label>User Name</label>
+                <input type="text"  name="user_name" class="form-control" id="formGroupName"
+                       value="{{ user.user_name }}">
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email"  name="user_email" class="form-control" id="formGroupEmail"
+                       value="{{ user.email }}">
+            </div>
+            <br>
+            <button type="submit" value="submit" class="btn btn-primary">Update</button>
+
+        </form>
+    </div>
+
+
+{% endblock %}

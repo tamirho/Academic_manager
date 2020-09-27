@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+    {% block title %}{{ student.user_name }} Courses{% endblock %}
+{% block content %}
+    <h4 class="card-header">Manage Courses</h4>
+    <div class="card-body">
+        <br>
+        <h5>My Courses:</h5>
+        <table class="table" style="width:100%">
+              <thead>
+                  <tr>
+                    <th scope="col"> </th>
+                    <th scope="col">Course Name</th>
+                    <th scope="col">Grade</th>
+                    <th scope="col">Lecturer</th>
+                    <th scope="col">Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for enrollment in student.enrollment %}
+                      <tr>
+                        <th scope="row">#</th>
+                        <th scope="row">{{ enrollment.course.course_name }}</th>
+                        <td cope="row">{{ enrollment.course.grade }}</td>
+                        <td cope="row">{{ enrollment.course.lecturer.user_name }}</td>
+                        <td cope="row"><a href="#"
+                               class="badge badge-primary">Course Details</a>
+                        <a href="{{ url_for('students.remove_enrollment' ,student_id=enrollment.student_id,
+                        enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
+                        </td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

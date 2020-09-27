@@ -16,9 +16,13 @@
               <tr>
                 <td>{{ teacher.user_name }}</td>
                 <td>{{ teacher.email }}</td>
-                <td>{{ teacher.password }}</td>
                 <td>
-                    <a href="#" class="badge badge-success">Update</a>
+                    <a href="{{ url_for('teachers.change_teacher_password', teacher_id=teacher.id) }}"
+                   class="badge badge-dark">Change Password</a>
+                </td>
+                <td>
+                    <a href="{{ url_for('teachers.update_teacher', teacher_id=teacher.id) }}"
+                       class="badge badge-success">Update</a>
                     <a href="{{ url_for('teachers.delete_teacher', teacher_id=teacher.id) }}"
                        class="badge badge-danger">Delete</a>
                 </td>

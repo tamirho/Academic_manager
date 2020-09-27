@@ -18,11 +18,14 @@ def login():
         user_name = request.form["user_name"]
         user_password = request.form["user_password"]
         user_type = user_authentication(user_name, user_password)
-        if not user_type == "none":
+        if user_type == "disapproved":
+            flash("You have not received approval from the admin", "warning")
+            return redirect(url_for("main.login"))
+        elif not user_type == "none":
             session["user_name"] = user_name
             session["type"] = user_type
             flash("Logged in successfully!", "success")
-            return redirect(url_for("main.user"))
+            return redirect(url_for("main.home"))
         else:
             flash("The username or password is invalid", "danger")
             return redirect(url_for("main.login"))

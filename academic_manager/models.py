@@ -3,7 +3,7 @@ from academic_manager import db
 
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_name = db.Column(db.String(30), nullable=False)
+    user_name = db.Column(db.String(30), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(60), nullable=False)
     enrollment = db.relationship('Enrollment', backref='student', lazy=True)
@@ -16,12 +16,16 @@ class Student(db.Model):
     def __repr__(self):
         return f"Student('{self.user_name}','{self.email}','{self.password}')"
 
+    def get_courses_id_lst(self):
+        return [enroll.course_id for enroll in self.enrollment]
+
 
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    approved = db.Column(db.Boolean, default=False, nullable=False)
     course = db.relationship('Course', backref='lecturer', lazy=True)
 
     def __init__(self, user_name, email, password):
@@ -30,7 +34,7 @@ class Teacher(db.Model):
         self.password = password
 
     def __repr__(self):
-        return f"Teacher('{self.user_name}','{self.email}','{self.password}')"
+        return f"Teacher('{self.user_name}','{self.email}','{self.password}','{self.approved}')"
 
 
 class Course(db.Model):
@@ -61,4 +65,14 @@ class Enrollment(db.Model):
         return f"Enrollment('{self.course_id}','{self.student_id}','{self.grade}')"
 
 
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(20), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
 
+    def __init__(self, user_name, password):
+        self.user_name = user_name
+        self.password = password
+
+    def __repr__(self):
+        return f"Admin('{self.user_name}','{self.password}')"

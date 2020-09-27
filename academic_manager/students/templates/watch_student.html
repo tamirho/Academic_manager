@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Watch {{ student.user_name }}{% endblock %}
+{% block content %}
+    <h4 class="card-header">{{ student.user_name }} Profile</h4>
+    <div class="card-body">
+        <h5>Details:</h5>
+        <table class="table" style="width:100%">
+          <thead>
+              <tr>
+                <th>User Name</th>
+                <th>Email</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>{{ student.user_name }}</td>
+                <td>{{ student.email }}</td>
+              </tr>
+          </tbody>
+        </table>
+        <br><br>
+        <div>
+            <h5>Courses:</h5>
+            <table class="table" style="width:100%">
+              <thead>
+                  <tr>
+                    <th>Course Name</th>
+                    <th>Grade</th>
+                    <th>Lecturer</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for enrollment in student.enrollment %}
+                      <tr>
+                        <td>{{ enrollment.course.course_name }}</td>
+                        <td>{{ enrollment.course.grade }}</td>
+                        <td>{{ enrollment.course.lecturer.user_name }}</td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

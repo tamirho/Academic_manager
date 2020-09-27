@@ -7,8 +7,9 @@
     {% if session["type"] %}
     <h5 class="card-header">Welcome {{ session["user_name"] }}</h5>
     <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <h5 class="card-title">HOME PAGE FOR UNSIGNED USERS</h5>
+        <p class="card-text">In the future, content for registered users will appear here,
+            Such as: outstanding students, recently published assignments.</p>
         {% for i in range(5) %}
         <p>.</p>
         {% endfor %}
@@ -17,8 +18,8 @@
     {% else %}
     <h5 class="card-header">Welcome</h5>
     <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <h5 class="card-title">HOME PAGE FOR UNSIGNED USERS</h5>
+        <p class="card-text">In the future, content for unregistered users will appear here.</p>
         <a href="{{ url_for('main.login') }}" class="btn btn-primary">Login</a>
         <a href="{{ url_for('main.sign_up') }}" class="btn btn-primary">Sign up</a><br>
     </div>
