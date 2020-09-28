@@ -10,7 +10,12 @@ students = Blueprint('students', __name__, template_folder="templates", url_pref
 @students.route("/")
 def student():
     student_profile = Student.query.filter_by(user_name=session["user_name"]).first()
-    return render_template("student_profile.html", student=student_profile)
+    if "user_name" in session and student_profile:
+        if session["user_name"] == student_profile.user_name:
+            return render_template("student_profile.html", student=student_profile)
+
+    flash("Page not found!", "warning")
+    return redirect(url_for("main.home"))
 
 
 @students.route("/<int:student_id>/update_student/", methods=['POST', 'GET'])
@@ -95,7 +100,12 @@ def delete_student(student_id):
 @students.route("/manage_courses/")
 def manage_courses():
     student_profile = Student.query.filter_by(user_name=session["user_name"]).first()
-    return render_template("student_courses.html", student=student_profile)
+    if "user_name" in session and student_profile:
+        if session["user_name"] == student_profile.user_name:
+            return render_template("student_courses.html", student=student_profile)
+
+    flash("Page not found!", "warning")
+    return redirect(url_for("main.home"))
 
 
 @students.route("/new_enrollment/", methods=['POST', 'GET'])
@@ -136,7 +146,7 @@ def remove_enrollment(student_id, enrollment_id):
             db.session.delete(enroll_to_del)
             db.session.commit()
             flash(f"{current_student.user_name} has been removed from {current_course.course_name}", "success")
-            return redirect(url_for("admin.admin_panel"))  # todo redirect back to the plase i used it
+            return redirect(url_for("students.watch_student", student_id=student_id))
         elif session["type"] == "teacher" and current_course.lecturer.user_name == session["user_name"]:
             db.session.delete(enroll_to_del)
             db.session.commit()

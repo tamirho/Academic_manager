@@ -51,9 +51,10 @@
                     <a class="nav-link" href="{{ url_for('courses.add_course') }}">Add Course</a>
                   </li>
                 </ul>
-                <form class="form-inline">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search by User Name" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <form action="{{ url_for('admin.admin_search_panel') }}" method="post" class="form-inline">
+                    <input class="form-control mr-sm-2" name="search" type="search"
+                           placeholder="Search by User Name" aria-label="Search" required>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" >Search</button>
                 </form>
              {% elif session["type"] == "student" %}
                 <a class="navbar-brand">Student</a>

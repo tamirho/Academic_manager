@@ -9,24 +9,33 @@
               <tr>
                 <th>User Name</th>
                 <th>Email</th>
-                <th>Password</th>
-                <th>Action</th>
+                {% if "user_name" in session %}
+                    {% if session["user_name"] == student.user_name %}
+                        <th>Password</th>
+                        <th>Action</th>
+                    {% endif %}
+                {% endif %}
+
               </tr>
           </thead>
           <tbody>
               <tr>
                 <td>{{ student.user_name }}</td>
                 <td>{{ student.email }}</td>
-                <td>
-                    <a href="{{ url_for('students.change_student_password', student_id=student.id) }}"
-                       class="badge badge-dark">Change Password</a>
-                </td>
-                <td>
-                    <a href="{{ url_for('students.update_student', student_id=student.id) }}"
-                       class="badge badge-success">Update</a>
-                    <a href="{{ url_for('students.delete_student', student_id=student.id) }}"
-                       class="badge badge-danger">Delete</a>
-                </td>
+                {% if "user_name" in session %}
+                  {% if session["user_name"] == student.user_name %}
+                    <td>
+                        <a href="{{ url_for('students.change_student_password', student_id=student.id) }}"
+                           class="badge badge-dark">Change Password</a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('students.update_student', student_id=student.id) }}"
+                           class="badge badge-success">Update</a>
+                        <a href="{{ url_for('students.delete_student', student_id=student.id) }}"
+                           class="badge badge-danger">Delete</a>
+                    </td>
+                   {% endif %}
+                {% endif %}
               </tr>
           </tbody>
         </table>

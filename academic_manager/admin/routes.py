@@ -50,3 +50,24 @@ def teacher_approval(teacher_id, action):
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))
+
+
+@admin.route("/search=?/", methods=['POST'])
+def admin_search_panel():
+    # todo can add smarter filters to search in db
+    if request.method == "POST":
+        value = request.form["search"]
+        student = Student.query.filter_by(user_name=value).first()
+        teacher = Teacher.query.filter_by(user_name=value).first()
+        course = Course.query.filter_by(course_name=value).first()
+
+        if student:
+            return redirect(url_for('students.watch_student', student_id=student.id))
+        elif teacher:
+            return redirect(url_for('teachers.watch_teacher', teacher_id=teacher.id))
+        elif course:
+            return redirect(url_for('teachers.watch_teacher', teacher_id=course.lecturer.id))
+            # todo change this url after build the view course page
+
+        flash("There is no such value!", "warning")
+        return redirect(request.referrer)

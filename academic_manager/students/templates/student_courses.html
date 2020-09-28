@@ -5,10 +5,10 @@
     <div class="card-body">
         <br>
         <h5>My Courses:</h5>
+        <br>
         <table class="table" style="width:100%">
               <thead>
                   <tr>
-                    <th scope="col"> </th>
                     <th scope="col">Course Name</th>
                     <th scope="col">Grade</th>
                     <th scope="col">Lecturer</th>
@@ -18,7 +18,6 @@
               <tbody>
                   {% for enrollment in student.enrollment %}
                       <tr>
-                        <th scope="row">#</th>
                         <th scope="row">{{ enrollment.course.course_name }}</th>
                         <td cope="row">{{ enrollment.course.grade }}</td>
                         <td cope="row">{{ enrollment.course.lecturer.user_name }}</td>

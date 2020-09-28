@@ -1,45 +1,76 @@
 {% extends "base.html" %}
 {% block title %}Watch {{ student.user_name }}{% endblock %}
 {% block content %}
-    <h4 class="card-header">{{ student.user_name }} Profile</h4>
-    <div class="card-body">
-        <h5>Details:</h5>
+<h4 class="card-header">{{ student.user_name }} Profile</h4>
+<div class="card-body">
+    <h5>Details:</h5>
+    <table class="table" style="width:100%">
+        <thead>
+        <tr>
+            <th>User Name</th>
+            <th>Email</th>
+            {% if "type" in session %}
+                {% if session["type"] == "admin" %}
+                    <th>Action</th>
+                {% endif %}
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ student.user_name }}</td>
+            <td>{{ student.email }}</td>
+            {% if "type" in session %}
+                {% if session["type"] == "admin" %}
+                    <td>
+                        <a href="{{ url_for('students.update_student', student_id=student.id) }}"
+                           class="badge badge-success">Update</a>
+                        <a href="{{ url_for('students.delete_student', student_id=student.id) }}"
+                           class="badge badge-danger">Delete</a>
+                    </td>
+                {% endif %}
+            {% endif %}
+        </tr>
+        </tbody>
+    </table>
+    <br><br>
+    <div>
+        <h5>Courses:</h5>
         <table class="table" style="width:100%">
-          <thead>
-              <tr>
-                <th>User Name</th>
-                <th>Email</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                <td>{{ student.user_name }}</td>
-                <td>{{ student.email }}</td>
-              </tr>
-          </tbody>
+            <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Grade</th>
+                <th>Lecturer</th>
+                {% if "type" in session %}
+                    {% if session["type"] == "admin" or session["type"] == "teacher" %}
+                        <th>Action</th>
+                    {% endif %}
+                {% endif %}
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for enrollment in student.enrollment %}
+            <tr>
+                <td>{{ enrollment.course.course_name }}</td>
+                <td>{{ enrollment.course.grade }}</td>
+                <td>{{ enrollment.course.lecturer.user_name }}</td>
+                <th>
+                    {% if "type" in session and "user_name" in session %}
+                        {% if session["type"] == "admin" or
+                        session["user_name"] == enrollment.course.lecturer.user_name %}
+                            <a href="#" class="badge badge-info">Watch Progress</a>
+                            <a href="{{ url_for('students.remove_enrollment', student_id=student.id,
+                            enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
+                        {% endif %}
+                    {% endif %}
+                </th>
+            </tr>
+            {% endfor %}
+            </tbody>
         </table>
-        <br><br>
-        <div>
-            <h5>Courses:</h5>
-            <table class="table" style="width:100%">
-              <thead>
-                  <tr>
-                    <th>Course Name</th>
-                    <th>Grade</th>
-                    <th>Lecturer</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for enrollment in student.enrollment %}
-                      <tr>
-                        <td>{{ enrollment.course.course_name }}</td>
-                        <td>{{ enrollment.course.grade }}</td>
-                        <td>{{ enrollment.course.lecturer.user_name }}</td>
-                      </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-        </div>
     </div>
+</div>
 
 {% endblock %}

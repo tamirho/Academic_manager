@@ -9,7 +9,12 @@ teachers = Blueprint('teachers', __name__, template_folder="templates", url_pref
 @teachers.route("/")
 def teacher():
     teacher_profile = Teacher.query.filter_by(user_name=session["user_name"]).first()
-    return render_template("teacher_profile.html", teacher=teacher_profile)
+    if "user_name" in session and teacher_profile:
+        if session["user_name"] == teacher_profile.user_name:
+            return render_template("teacher_profile.html", teacher=teacher_profile)
+
+    flash("Page not found!", "warning")
+    return redirect(url_for("main.home"))
 
 
 @teachers.route("/<int:teacher_id>/update_teacher/", methods=['POST', 'GET'])
@@ -35,9 +40,9 @@ def update_teacher(teacher_id):
                 return redirect(url_for("main.home"))
             for msg in messages:
                 flash(msg, "warning")
-            return render_template("update_user_profile.html", teacher=teacher_to_update)
+            return render_template("update_user_profile.html", user=teacher_to_update)
         elif teacher_to_update.user_name == session["user_name"] or session["type"] == "admin":
-            return render_template("update_user_profile.html", teacher=teacher_to_update)
+            return render_template("update_user_profile.html", user=teacher_to_update)
 
 
 @teachers.route("/<int:teacher_id>/change_password/", methods=['POST', 'GET'])
@@ -87,6 +92,12 @@ def delete_teacher(teacher_id):
     return redirect(url_for("main.home"))
 
 
+@teachers.route("/watch/<int:teacher_id>")
+def watch_teacher(teacher_id):
+    if "type" in session:
+        if session["type"] == "admin":
+            teacher_profile = Teacher.query.filter_by(id=teacher_id).first()
+            return render_template("watch_teacher.html", teacher=teacher_profile)
 
-
-
+    flash("Page not found!", "warning")
+    return redirect(url_for("main.home"))

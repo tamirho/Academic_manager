@@ -1,32 +1,27 @@
 {% extends "base.html" %}
-{% block title %}Teacher Page{% endblock %}
+{% block title %}Watch {{ teacher.user_name }}{% endblock %}
 {% block content %}
-    <h5 class="card-header">{{ teacher.user_name }} Profile</h5>
+    <h4 class="card-header">{{ teacher.user_name }} Profile</h4>
     <div class="card-body">
         <h5>Details:</h5>
-        <table class="table"  style="width:100%">
-            <thead>
+        <table class="table" style="width:100%">
+          <thead>
               <tr>
-                <th>Name</th>
+                <th>User Name</th>
                 <th>Email</th>
-                {% if "user_name" in session %}
-                    {% if session["user_name"] == teacher.user_name %}
-                        <th>Password</th>
+                {% if "type" in session %}
+                    {% if session["type"] == "admin" %}
                         <th>Action</th>
                     {% endif %}
                 {% endif %}
               </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
               <tr>
                 <td>{{ teacher.user_name }}</td>
                 <td>{{ teacher.email }}</td>
-                {% if "user_name" in session %}
-                    {% if session["user_name"] == teacher.user_name %}
-                        <td>
-                            <a href="{{ url_for('teachers.change_teacher_password', teacher_id=teacher.id) }}"
-                           class="badge badge-dark">Change Password</a>
-                        </td>
+                {% if "type" in session %}
+                    {% if session["type"] == "admin" %}
                         <td>
                             <a href="{{ url_for('teachers.update_teacher', teacher_id=teacher.id) }}"
                                class="badge badge-success">Update</a>
@@ -36,16 +31,22 @@
                     {% endif %}
                 {% endif %}
               </tr>
+          </tbody>
         </table>
         <br><br>
         <div>
-            <h5>Courses you teach:</h5>
+            <h5>Courses:</h5>
             <table class="table" style="width:100%">
               <thead>
                   <tr>
                     <th>Course Name</th>
                     <th>Participants</th>
-                    <th>Action</th>
+                    {% if "type" in session %}
+                      {% if session["type"] == "admin" %}
+                            <th>Action</th>
+                      {% endif %}
+                    {% endif %}
+
                   </tr>
               </thead>
               <tbody>
@@ -53,8 +54,8 @@
                       <tr>
                         <td>{{ course.course_name }}</td>
                         <td> </td>
-                        {% if "type" in session and "user_name" in session %}
-                          {% if session["type"] == "admin" or session["user_name"] == teacher.user_name %}
+                        {% if "type" in session %}
+                          {% if session["type"] == "admin"  %}
                             <th>
                                 <a href="#" class="badge badge-info">Watch Course</a>
                                 <a href="{{ url_for('courses.delete_course', course_id=course.id) }}"
@@ -68,4 +69,5 @@
             </table>
         </div>
     </div>
+
 {% endblock %}

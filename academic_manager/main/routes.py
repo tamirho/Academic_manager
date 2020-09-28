@@ -83,3 +83,4 @@ def logout():
         flash(f"{user_name}, you logged out successfully!", "success")
         clear_user_info_from_session()  # todo check if session.clear() is better for me?
     return redirect(url_for("main.home"))
+

@@ -15,7 +15,7 @@ def add_course():
         if validate_course_name(course_name):
             make_new_course_by_names(course_name, teacher_name)
             flash("The course is added to the list", "success")
-            return redirect(url_for("admin.admin_panel"))
+            return redirect(url_for("courses.add_course"))
         else:
             flash("That Course name is invalid", "warning")
             return redirect(url_for("courses.add_course"))
