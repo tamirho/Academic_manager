@@ -21,10 +21,14 @@
                         <th scope="row">{{ enrollment.course.course_name }}</th>
                         <td cope="row">{{ enrollment.course.grade }}</td>
                         <td cope="row">{{ enrollment.course.lecturer.user_name }}</td>
-                        <td cope="row"><a href="#"
-                               class="badge badge-primary">Course Details</a>
-                        <a href="{{ url_for('students.remove_enrollment' ,student_id=enrollment.student_id,
-                        enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
+                        <td cope="row">
+                            <a href="#"
+                               class="badge badge-info">Course Details</a>
+                            <a href="{{ url_for('courses.view_course', course_id=enrollment.course_id) }}"
+                               class="badge badge-primary">Course Tasks</a>
+                            <a href="{{ url_for('students.remove_enrollment' ,student_id=enrollment.student_id,
+                            enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
+
                         </td>
                       </tr>
                   {% endfor %}

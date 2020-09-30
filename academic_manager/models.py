@@ -1,4 +1,5 @@
 from academic_manager import db
+from datetime import datetime
 
 
 class Student(db.Model):
@@ -6,6 +7,8 @@ class Student(db.Model):
     user_name = db.Column(db.String(30), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(60), nullable=False)
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     enrollment = db.relationship('Enrollment', backref='student', lazy=True)
 
     def __init__(self, user_name, email, password):
@@ -25,6 +28,8 @@ class Teacher(db.Model):
     user_name = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     approved = db.Column(db.Boolean, default=False, nullable=False)
     course = db.relationship('Course', backref='lecturer', lazy=True)
 
@@ -42,6 +47,7 @@ class Course(db.Model):
     course_name = db.Column(db.String(30), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
     enrollment = db.relationship('Enrollment', backref='course', lazy=True)
+    task = db.relationship('Task', backref='course', lazy=True)
 
     def __init__(self, course_name, teacher_id):
         self.course_name = course_name
@@ -76,3 +82,21 @@ class Admin(db.Model):
 
     def __repr__(self):
         return f"Admin('{self.user_name}','{self.password}')"
+
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+
+    def __init__(self, title, content, course_id):
+        self.title = title
+        self.content = content
+        self.course_id = course_id
+        self.date_posted = datetime.utcnow()
+
+    def __repr__(self):
+        return f"Task('{self.title}','{self.date_posted}')"

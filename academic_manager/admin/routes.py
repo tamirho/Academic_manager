@@ -46,7 +46,7 @@ def teacher_approval(teacher_id, action):
                 current_teacher.approved = False
                 flash(f"{current_teacher.user_name} has been disapproved", "warning")
             db.session.commit()
-            return redirect(url_for("admin.admin_teachers"))
+            return redirect(request.referrer)
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))
@@ -66,7 +66,7 @@ def admin_search_panel():
         elif teacher:
             return redirect(url_for('teachers.watch_teacher', teacher_id=teacher.id))
         elif course:
-            return redirect(url_for('teachers.watch_teacher', teacher_id=course.lecturer.id))
+            return redirect(url_for('courses.view_course', course_id=course.id))
             # todo change this url after build the view course page
 
         flash("There is no such value!", "warning")

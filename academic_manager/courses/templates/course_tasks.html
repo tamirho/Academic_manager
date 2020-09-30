@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_name }}{% endblock %}
+{% block content %}
+
+    <h4 class="card-header">{{ course.course_name }} - Tasks</h4>
+    <div class="card-body">
+
+        {% for task in tasks %}
+
+                <div class="jumbotron">
+                  <h1 class="display-4">{{ task.title }}</h1>
+                  <p class="lead">Posted by {{ teacher.user_name }}
+                       in {{ task.date_posted.strftime('%H:%M  %b %d, %Y') }}
+                  </p>
+                  <hr class="my-4">
+                  <p>{{ task.content }} </p>
+                  <p>more content here more content here more content here more content here more content here</p>
+                  <!--a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a-->
+
+                  <a href="#"
+                           class="badge badge-dark">Update</a>
+                  <a href="#"
+                           class="badge badge-danger">Delete</a>
+                </div>
+
+        {% endfor %}
+    </div>
+
+{% endblock %}
