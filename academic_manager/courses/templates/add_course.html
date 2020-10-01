@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Add Course{% endblock %}
+{% block content %}
+
+    <h5 class="card-header">Add Course</h5>
+    <div class="card-body">
+
+        <form action="#" method="post">
+            <div class="form-group col-md-4">
+              {% if "type" in session %}
+                  {% if session["type"] == "admin" %}
+                      <label for="inputTeacher">Choose Teacher:</label>
+                      <select name="teacher_name" id="inputTeacher" class="form-control">
+                        <option selected>Teacher name</option>
+                          {% for teacher in teacher_list %}
+                            <option>{{ teacher.user_name }}</option>
+                          {% endfor %}
+                      </select>
+                  {% elif session["type"] == "teacher" %}
+                        <label for="staticTeacher"><b>Teacher's Name:</b></label>
+                        <input type="text" name="teacher_name" readonly class="form-control-plaintext"
+                                 id="staticTeacher" value="{{ current_teacher.user_name }}">
+                  {% endif %}
+              {% endif %}
+              <br>
+              <label>Enter Course name:</label>
+              <input type="text" name="course_name" class="form-control" id="InputCourse"
+                       placeholder="Course Name">
+            </div>
+            <br>
+            <button type="submit" value="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+    </div>
+
+{% endblock %}

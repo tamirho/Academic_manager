@@ -1,14 +1,17 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
 from academic_manager import db
-from academic_manager.main.form_validation import *
 from academic_manager.main.utilities import *
+from academic_manager.students.utilities import *
+from datetime import datetime
 
 main = Blueprint('main', __name__, template_folder="templates")
 
 
 @main.route("/")
 def home():
-    return render_template("home.html")
+    best_student = get_best_student()
+    current_date = datetime.now()
+    return render_template("home.html", best_student=best_student, current_date=current_date)
 
 
 @main.route("/login/", methods=['POST', 'GET'])
@@ -18,11 +21,14 @@ def login():
         user_name = request.form["user_name"]
         user_password = request.form["user_password"]
         user_type = user_authentication(user_name, user_password)
-        if not user_type == "none":
+        if user_type == "disapproved":
+            flash("You have not received approval from the admin", "warning")
+            return redirect(url_for("main.login"))
+        elif not user_type == "none":
             session["user_name"] = user_name
             session["type"] = user_type
             flash("Logged in successfully!", "success")
-            return redirect(url_for("main.user"))
+            return redirect(url_for("main.home"))
         else:
             flash("The username or password is invalid", "danger")
             return redirect(url_for("main.login"))
@@ -80,3 +86,4 @@ def logout():
         flash(f"{user_name}, you logged out successfully!", "success")
         clear_user_info_from_session()  # todo check if session.clear() is better for me?
     return redirect(url_for("main.home"))
+

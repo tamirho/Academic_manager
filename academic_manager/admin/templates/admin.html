@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Admin Page{% endblock %}
 {% block content %}
-    <h5 class="card-header">Admin</h5>
+    <h5 class="card-header">Admin Panel</h5>
     <div class="card-body">
-        <a href="{{ url_for('admin.add_course') }}" class="btn btn-primary" >Add Course</a>
         <table style="width:100%">
           <tr>
               <th colspan="4"><h2>Student</h2></th>
@@ -20,17 +19,17 @@
                 <td>{{ student.user_name }}</td>
                 <td>{{ student.email }}</td>
                 <td>{{ student.password }}</td>
-                <td><a href="#" class="badge badge-primary">Watch</a>
+                <td><a href="{{ url_for('students.watch_student', student_id=student.id) }}"
+                       class="badge badge-primary">Watch</a>
                     <a href="#" class="badge badge-success">Update</a>
                     <a href="{{ url_for('students.delete_student', student_id=student.id) }}"
                        class="badge badge-danger">Delete</a>
                 </td>
               </tr>
           {% endfor %}
-        <tr><th colspan="4"><br></tr>
-          <tr>
-              <th colspan="4"><br></th>
-          </tr>
+        </table>
+        <br><br>
+        <table style="width:100%">
           <tr>
               <th colspan="4"><h2>Teacher</h2></th>
           </tr>
@@ -38,6 +37,7 @@
             <th>Name</th>
             <th>Email</th>
             <th>Password</th>
+            <th colspan="2">Approval</th>
             <th>Action</th>
           </tr>
 
@@ -46,9 +46,28 @@
                 <td>{{ teacher.user_name }}</td>
                 <td>{{ teacher.email }}</td>
                 <td>{{ teacher.password }}</td>
+                <td>
+                    {% if teacher.approved %}
+                        True
+                    {% else %}
+                        False
+                    {% endif %}
+                </td>
+
                  <td>
-                     <a href="#" class="badge badge-primary">Watch</a>
-                    <a href="#" class="badge badge-success">Update</a>
+                    {% if teacher.approved %}
+                        <a href="{{ url_for('admin.teacher_approval', teacher_id=teacher.id, action='disapprove') }}"
+                           class="badge badge-warning">Disapprove</a>
+                    {% else %}
+                        <a href="{{ url_for('admin.teacher_approval' ,teacher_id=teacher.id, action='approve') }}"
+                           class="badge badge-info">Approve</a>
+                    {% endif %}
+                 </td>
+                 <td>
+                    <a href="{{ url_for('teachers.watch_teacher', teacher_id=teacher.id) }}"
+                       class="badge badge-primary">Watch</a>
+                    <a href="{{ url_for('teachers.update_teacher', teacher_id=teacher.id) }}"
+                       class="badge badge-success">Update</a>
                     <a href="{{ url_for('teachers.delete_teacher', teacher_id=teacher.id) }}"
                        class="badge badge-danger">Delete</a>
                 </td>
@@ -72,7 +91,10 @@
               <tr>
                 <td>{{ course.course_name }}</td>
                 <td>{{ course.lecturer.user_name }}</td>
-                <td>  </td>
+                <td>{% for enroll in course.enrollment %}
+                    {{ enroll.student.user_name }},
+                    {% endfor %}
+                </td>
                 <td><a href="#" class="badge badge-primary">Watch</a>
                     <a href="#" class="badge badge-success">Update</a>
                     <a href="{{ url_for('courses.delete_course', course_id=course.id) }}"

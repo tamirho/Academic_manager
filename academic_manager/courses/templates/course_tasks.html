@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_name }}{% endblock %}
+{% block content %}
+
+<h4 class="card-header">{{ course.course_name }} - Tasks</h4>
+<div class="card-body">
+    <p>Teacher: {{ teacher.user_name }}  </br>  Number of tasks: {{ tasks|length }}</p>
+
+    {% for task in tasks %}
+        <div class="jumbotron">
+            <h1 class="display-4">{{ task.title }}</h1>
+            <p class="lead">Posted by {{ teacher.user_name }}
+                in {{ task.date_posted.strftime('%H:%M %b %d, %Y') }}
+            </p>
+            <hr class="my-4">
+            <p>{{ task.content }} </p>
+
+            {% if "type" in session and "user_name" in session %}
+                {% if session["type"] == "admin" or session["user_name"] == teacher.user_name %}
+                    <a href="#"
+                       class="badge badge-dark">Update</a>
+                    <a href="#"
+                       class="badge badge-danger">Delete</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

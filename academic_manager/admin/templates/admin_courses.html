@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin Page - Courses{% endblock %}
+{% block content %}
+    <h5 class="card-header">Admin Panel</h5>
+    <div class="card-body">
+        <table style="width:100%">
+          <tr>
+              <th colspan="4"><h2>Manage Courses:</h2></th>
+          </tr>
+          <tr>
+            <th>Course Name</th>
+            <th>Teacher</th>
+            <th>Students</th>
+            <th>Action</th>
+          </tr>
+
+          {% for course in courses_list %}
+              <tr>
+                <td>{{ course.course_name }}</td>
+                <td>{{ course.lecturer.user_name }}</td>
+                <td>
+                    {% for enroll in course.enrollment %}
+                        {{ enroll.student.user_name }},
+                    {% endfor %}
+                </td>
+                <td><a href="{{ url_for('courses.course_dashboard_teacher', course_id=course.id) }}"
+                       class="badge badge-info">Dashboard</a>
+                    <a href="{{ url_for('courses.delete_course', course_id=course.id) }}"
+                       class="badge badge-danger">Delete</a>
+                </td>
+              </tr>
+          {% endfor %}
+        </table>
+        <br>
+    </div>
+{% endblock %}
