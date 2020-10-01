@@ -2,15 +2,16 @@
 {% block title %}Update Grades{% endblock %}
 {% block content %}
 
-<h5 class="card-header">{{ course.course_name }} - Update Grades</h5>
+<h4 class="card-header">{{ course.course_name }} - Update Grades</h4>
 <div class="card-body">
 
     <form action="#" method="post">
         <div class="form-group">
+            <h6>Participants: {{ course.enrollment|length }}</h6>
             {% for enroll in course.enrollment %}
                 <div class="form-group row">
                     <label for="inputGrade{{ enroll.student.id }}" class="col-sm-2 col-form-label">
-                        {{ enroll.student.user_name }}</label>
+                        <small>{{ loop.index }}.</small> {{ enroll.student.user_name }}</label>
                     <div class="col-sm-2">
                        <input type="number" name="{{ enroll.student.user_name }}" min="0" max="100"
                               class="form-control" id="inputGrade{{ enroll.student.id }}"

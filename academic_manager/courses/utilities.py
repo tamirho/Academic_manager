@@ -23,3 +23,10 @@ def make_new_task(title, content, course_id):
     db.session.add(task)
     db.session.commit()
 
+
+def update_my_task(title, content, task_to_update):
+    task_to_update.title = title
+    task_to_update.content = content
+    task_to_update.add_update_time()
+    db.session.commit()
+

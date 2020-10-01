@@ -44,6 +44,7 @@
         <table class="table" style="width:100%">
               <thead>
                   <tr>
+                    <th scope="col">#</th>
                     <th scope="col">Course Name</th>
                     <th scope="col">Grade</th>
                     <th scope="col">Lecturer</th>
@@ -52,8 +53,9 @@
               <tbody>
                   {% for enrollment in student.enrollment %}
                       <tr>
+                        <td>{{ loop.index }}</td>
                         <th scope="row">{{ enrollment.course.course_name }}</th>
-                        <td>{{ enrollment.course.grade }}</td>
+                        <td>{{ enrollment.grade }}</td>
                         <td>{{ enrollment.course.lecturer.user_name }}</td>
                       </tr>
                   {% endfor %}

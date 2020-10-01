@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ teacher.user_name }} Courses{% endblock %}
+{% block content %}
+<h4 class="card-header">Manage Courses</h4>
+<div class="card-body">
+    <br>
+    <h5>My Courses:</h5>
+    <br>
+    <table class="table" style="width:100%">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Course Name</th>
+                <th scope="col">Participants</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for course in teacher.course %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ course.course_name }}</td>
+            <td>
+                {{ course.enrollment|length }}
+            </td>
+            {% if "type" in session and "user_name" in session %}
+                {% if session["type"] == "teacher" or session["user_name"] == teacher.user_name %}
+                    <th>
+                        <a href="{{ url_for('courses.course_dashboard_teacher', course_id=course.id) }}"
+                              class="badge badge-info">Dashboard</a>
+                        <a href="{{ url_for('courses.delete_course', course_id=course.id) }}"
+                           class="badge badge-danger">Delete</a></p>
+                    </th>
+                {% endif %}
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}

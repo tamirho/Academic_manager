@@ -1,13 +1,17 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
 from academic_manager import db
 from academic_manager.main.utilities import *
+from academic_manager.students.utilities import *
+from datetime import datetime
 
 main = Blueprint('main', __name__, template_folder="templates")
 
 
 @main.route("/")
 def home():
-    return render_template("home.html")
+    best_student = get_best_student()
+    current_date = datetime.now()
+    return render_template("home.html", best_student=best_student, current_date=current_date)
 
 
 @main.route("/login/", methods=['POST', 'GET'])

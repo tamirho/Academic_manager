@@ -22,11 +22,8 @@
                 <td>{{ teacher.email }}</td>
                 <td>{{ teacher.password }}</td>
                 <td>
-                    {% if teacher.approved %}
-                        True
-                    {% else %}
-                        False
-                    {% endif %}
+                    {{ teacher.approved }}
+
                 </td>
 
                  <td>

@@ -1,5 +1,6 @@
 from academic_manager import db
 from datetime import datetime
+from functools import reduce
 
 
 class Student(db.Model):
@@ -7,8 +8,8 @@ class Student(db.Model):
     user_name = db.Column(db.String(30), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(60), nullable=False)
-    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.now)
     enrollment = db.relationship('Enrollment', backref='student', lazy=True)
 
     def __init__(self, user_name, email, password):
@@ -22,14 +23,18 @@ class Student(db.Model):
     def get_courses_id_lst(self):
         return [enroll.course_id for enroll in self.enrollment]
 
+    def get_avg_grade(self):
+        grade_list = [int(enroll.grade) for enroll in self.enrollment if enroll.grade]
+        return reduce(lambda a, b: a + b, grade_list) / len(grade_list)
+
 
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.now)
     approved = db.Column(db.Boolean, default=False, nullable=False)
     course = db.relationship('Course', backref='lecturer', lazy=True)
 
@@ -88,15 +93,21 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    update_time = db.Column(db.DateTime, nullable=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
 
     def __init__(self, title, content, course_id):
         self.title = title
         self.content = content
         self.course_id = course_id
-        self.date_posted = datetime.utcnow()
+        self.date_posted = datetime.now()
 
     def __repr__(self):
-        return f"Task('{self.title}','{self.date_posted}')"
+        if self.update_time:
+            return f"Task('{self.title}','{self.date_posted}','{self.update_time}')"
+        else:
+            return f"Task('{self.title}','{self.date_posted}')"
+
+    def add_update_time(self):
+        self.update_time = datetime.now()

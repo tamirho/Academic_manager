@@ -60,7 +60,7 @@
                 <a class="navbar-brand">Student</a>
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                   <li class="nav-item active">
-                    <a class="nav-link" href="{{ url_for('students.manage_courses') }}">Mange Courses</a>
+                    <a class="nav-link" href="{{ url_for('students.manage_courses_student') }}">Manage Courses</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('students.new_enrollment') }}">New Enrollment</a>
@@ -69,10 +69,18 @@
              {% elif session["type"] == "teacher" %}
                 <a class="navbar-brand">Teacher</a>
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="{{ url_for('teachers.manage_courses_teacher') }}">Manage Courses</a>
+                  </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('courses.add_course') }}">Add Course</a>
                   </li>
                 </ul>
+                <div class="navbar-nav">
+                    {% if course %}
+                    <h5>{{ course.course_name if course.course_name }}</h5>
+                    {% endif %}
+                </div>
             {% endif %}
         </nav>
 
@@ -80,13 +88,14 @@
 
     </br>
 
-        <div class="mx-auto w-75">
+    <div class="mx-auto w-75">
         <div class="card">
             {% block content %}{% endblock %}
         </div>
+
     </div>
     </br>
-        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
                 {% for category, msg in messages %}
                     <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">

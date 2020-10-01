@@ -1,5 +1,6 @@
 from flask import session
 from academic_manager.main.form_validation import *
+from academic_manager.models import Student
 
 
 def clear_user_info_from_session():
@@ -38,3 +39,5 @@ def change_user_password(user_to_update, old_pass, new_pass, pass_confirmation):
         db.session.commit()
 
     return messages
+
+

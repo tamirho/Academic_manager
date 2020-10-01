@@ -39,6 +39,7 @@
         <table class="table" style="width:100%">
             <thead>
             <tr>
+                <th>#</th>
                 <th>Course Name</th>
                 <th>Grade</th>
                 <th>Lecturer</th>
@@ -53,8 +54,9 @@
             <tbody>
             {% for enrollment in student.enrollment %}
             <tr>
+                <td>{{ loop.index }}</td>
                 <td>{{ enrollment.course.course_name }}</td>
-                <td>{{ enrollment.course.grade }}</td>
+                <td>{{ enrollment.grade }}</td>
                 <td>{{ enrollment.course.lecturer.user_name }}</td>
                 <th>
                     {% if "type" in session and "user_name" in session %}

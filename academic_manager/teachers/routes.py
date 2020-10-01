@@ -101,3 +101,14 @@ def watch_teacher(teacher_id):
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))
+
+
+@teachers.route("/manage_courses/")
+def manage_courses_teacher():
+    teacher_profile = Teacher.query.filter_by(user_name=session["user_name"]).first()
+    if "user_name" in session and teacher_profile:
+        if session["user_name"] == teacher_profile.user_name:
+            return render_template("teacher_courses.html", teacher=teacher_profile)
+
+    flash("Page not found!", "warning")
+    return redirect(url_for("main.home"))
