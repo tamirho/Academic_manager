@@ -65,7 +65,7 @@ def admin_search_panel():
         elif teacher:
             return redirect(url_for('teachers.watch_teacher', teacher_id=teacher.id))
         elif course:
-            return redirect(url_for('courses.view_course', course_id=course.id))
+            return redirect(url_for('courses.course_dashboard_teacher', course_id=course.id))
             # todo change this url after build the view course page
 
         flash("There is no such value!", "warning")

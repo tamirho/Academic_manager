@@ -39,12 +39,22 @@
     </ul>
 
     {% else %}
-    <h5 class="card-title">Welcome To the Academic Manager</h5>
-    <p class="card-text">Please Login\Sign-up with the Academic's email address.</p>
+    <h5 class="card-title"></h5>
+    <p class="card-text"></p>
 
-    <a href="{{ url_for('main.login') }}" class="btn btn-primary">Login</a>
-    <a href="{{ url_for('main.sign_up') }}" class="btn btn-info">Register</a><br>
 
+    <div class="media">
+            <div class="media-body">
+                <h5 class="mt-4">Welcome To the Academic Manager</h5>
+                <p>Please Login\Sign-up with the Academic's email address.</p>
+                <div class="mt-4">
+                    <a href="{{ url_for('main.login') }}" class="btn btn-info mt-4">Login</a>
+                    <a href="{{ url_for('main.sign_up') }}" class="btn btn-warning mt-4">Register</a>
+                </div>
+            </div>
+            <img src="{{ url_for('static', filename='/images/book.jpg') }}"
+                 class="mr-5" width="250" height="250" alt="graduate-cap">
+        </div>
 
     {% endif %}
 </div>
