@@ -80,18 +80,14 @@ def delete_student(student_id):
 
     if "type" in session and student_to_del:
         if student_to_del.user_name == session["user_name"]:
-            Enrollment.query.filter(Enrollment.student_id == student_to_del.id).delete()
-            db.session.delete(student_to_del)
-            db.session.commit()
+            student_to_del.delete_from_db()
             flash("Your account has been deleted", "success")
             clear_user_info_from_session()  # todo check if session.clear() is better for me?
             return redirect(url_for("main.home"))
         elif session["type"] == "admin":
             flash(f"{student_to_del.user_name} has been deleted", "success")
-            Enrollment.query.filter(Enrollment.student_id == student_to_del.id).delete()
-            db.session.delete(student_to_del)
-            db.session.commit()
-            return redirect(url_for("admin.admin_panel"))
+            student_to_del.delete_from_db()
+            return redirect(url_for("admin.admin_students"))
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))
@@ -137,15 +133,9 @@ def remove_enrollment(student_id, enrollment_id):
     current_student = Student.query.get(student_id)
     current_course = enroll_to_del.course
     if "type" in session and enroll_to_del:
-        if session["type"] == "student" and current_student.user_name == session["user_name"]:
-            db.session.delete(enroll_to_del)
-            db.session.commit()
-            flash(f"{current_student.user_name} has been removed from {current_course.course_name}", "success")
-            return redirect(url_for("students.manage_courses"))
-        elif session["type"] == "admin" or \
-                (session["type"] == "teacher" and current_course.lecturer.user_name == session["user_name"]):
-            db.session.delete(enroll_to_del)
-            db.session.commit()
+        if current_student.user_name == session["user_name"] or session["type"] == "admin" or \
+                current_course.lecturer.user_name == session["user_name"]:
+            enroll_to_del.delete_from_db()
             flash(f"{current_student.user_name} has been removed from {current_course.course_name}", "success")
             return redirect(request.referrer)
 

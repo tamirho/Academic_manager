@@ -24,10 +24,11 @@
             </div>
         </li>
         <br>
+        {% if best_student and best_student.avg() > 85 %}
         <li class="media">
             <div class="media-body">
                 <h5 class="mt-4">Outstanding student this month</h5>
-                <p>Name: {{ best_student.user_name }} | Avg: {{ '%0.2f' % best_student.get_avg_grade()|float }}</p>
+                <p>Name: {{ best_student.user_name }} | Avg: {{ '%0.2f' % best_student.avg()|float }}</p>
                 <p>Congratulations to {{ best_student.user_name }} who received the best average for
                     {{ current_date.strftime('%B')}} and for that he received the Outstanding Student
                     Award of the month.</p><strong>Rise and Succeed!</strong>
@@ -36,6 +37,7 @@
             <img src="{{ url_for('static', filename='/images/graduate-cap.jpg') }}"
                  class="ml-3" width="310" height="230" alt="graduate-cap">
         </li>
+        {% endif %}
     </ul>
 
     {% else %}

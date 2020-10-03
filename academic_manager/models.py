@@ -20,12 +20,20 @@ class Student(db.Model):
     def __repr__(self):
         return f"Student('{self.user_name}','{self.email}','{self.password}')"
 
+    def delete_from_db(self):
+        Enrollment.query.filter(Enrollment.student_id == self.id).delete()
+        db.session.delete(self)
+        db.session.commit()
+
     def get_courses_id_lst(self):
         return [enroll.course_id for enroll in self.enrollment]
 
-    def get_avg_grade(self):
+    def avg(self):
         grade_list = [int(enroll.grade) for enroll in self.enrollment if enroll.grade]
-        return reduce(lambda a, b: a + b, grade_list) / len(grade_list)
+        if grade_list:
+            return reduce(lambda a, b: a + b, grade_list) / len(grade_list)
+        else:
+            return 0
 
 
 class Teacher(db.Model):
@@ -46,6 +54,12 @@ class Teacher(db.Model):
     def __repr__(self):
         return f"Teacher('{self.user_name}','{self.email}','{self.password}','{self.approved}')"
 
+    def delete_from_db(self):
+        for course in Course.query.filter(Course.teacher_id == self.id):
+            course.delete_from_db()
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,6 +75,12 @@ class Course(db.Model):
     def __repr__(self):
         return f"Course('{self.course_name}','{self.teacher_id}')"
 
+    def delete_from_db(self):
+        Enrollment.query.filter(Enrollment.course_id == self.id).delete()
+        Task.query.filter(Task.course_id == self.id).delete()
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Enrollment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -75,6 +95,10 @@ class Enrollment(db.Model):
     def __repr__(self):
         return f"Enrollment('{self.course_id}','{self.student_id}','{self.grade}')"
 
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,6 +111,10 @@ class Admin(db.Model):
 
     def __repr__(self):
         return f"Admin('{self.user_name}','{self.password}')"
+
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class Task(db.Model):
@@ -108,6 +136,16 @@ class Task(db.Model):
             return f"Task('{self.title}','{self.date_posted}','{self.update_time}')"
         else:
             return f"Task('{self.title}','{self.date_posted}')"
+
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def update(self, new_title, new_content):
+        self.title = new_title
+        self.content = new_content
+        self.add_update_time()
+        db.session.commit()
 
     def add_update_time(self):
         self.update_time = datetime.now()

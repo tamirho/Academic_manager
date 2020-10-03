@@ -45,11 +45,12 @@
 
       <!-- Home -->
       <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-          <p>Teacher: {{ teacher.user_name }}</p>
+          <p>Teacher: {{ course.lecturer.user_name }}</p>
           <p>In this course you have {{ course.enrollment|length }} participants.</p><br><br>
-          <strong>Outstanding student</strong>
-          <p>Name: {{ best_student.user_name }} |  Avg: {{ '%0.2f' % best_student.get_avg_grade()|float }}</p>
-
+          {% if best_student %}
+            <strong>Outstanding student</strong>
+            <p>Name: {{ best_student.user_name }} |  Avg: {{ '%0.2f' % best_student.avg()|float }}</p>
+          {% endif %}
       </div>
 
       <!-- Participants -->
@@ -89,11 +90,15 @@
         {% for task in tasks %}
             <div class="jumbotron">
                 <h1 class="display-4">{{ task.title }}</h1>
-                <p class="lead">Posted by {{ teacher.user_name }}
-                    in {{ task.date_posted.strftime('%H:%M %b %d, %Y') }}
+                <p class="lead">Posted by {{ course.lecturer.user_name }}
+                    at {{ task.date_posted.strftime('%H:%M %b %d, %Y') }}
+                    {% if task.update_time %}
+                        <br>Last update at {{ task.update_time.strftime('%H:%M %b %d, %Y') }}
+                    {% endif %}
                 </p>
                 <hr class="my-4">
                 <p>{{ task.content }} </p>
+
 
                 <a href="{{ url_for('courses.update_task', task_id=task.id) }}" class="badge badge-dark">Update</a>
                 <a href="{{ url_for('courses.delete_task', task_id=task.id) }}" class="badge badge-danger">Delete</a>

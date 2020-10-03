@@ -10,9 +10,16 @@ def make_new_enrollment(current_student, current_course):
 
 def get_best_student(course_id=0):
     if course_id:
-        enrollment_list = Enrollment.query.filter_by(course_id=course_id)
-        best_grade_enrollment = max(enrollment_list, key=lambda x: x.grade)
-        return best_grade_enrollment.student
+        try:
+            enrollment_list = Enrollment.query.filter_by(course_id=course_id)
+            best_grade_enrollment = max(enrollment_list, key=lambda x: x.grade)
+            return best_grade_enrollment.student
+        except:
+            return None
     else:
-        student_list = Student.query.all()
-        return max(student_list, key=lambda x: x.get_avg_grade())
+        try:
+            student_list = Student.query.all()
+            return max(student_list, key=lambda x: x.avg())
+        except:
+            return None
+

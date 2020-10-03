@@ -36,21 +36,12 @@ def add_course():
 @courses.route("/<int:course_id>/delete_course/")
 def delete_course(course_id):
     course_to_del = Course.query.get(course_id)
-
     if "type" in session and course_to_del:
-        course_name = course_to_del.course_name
-        if course_to_del.lecturer.user_name == session["user_name"]:
-            Enrollment.query.filter(Enrollment.course_id == course_to_del.id).delete()
-            db.session.delete(course_to_del)
-            db.session.commit()
+        if course_to_del.lecturer.user_name == session["user_name"] or session["type"] == "admin":
+            course_name = course_to_del.course_name
+            course_to_del.delete_from_db()
             flash(f"{course_name} has been deleted", "success")
-            return redirect(url_for("main.home"))  # todo find another page to redirect
-        elif session["type"] == "admin":
-            Enrollment.query.filter(Enrollment.course_id == course_to_del.id).delete()
-            db.session.delete(course_to_del)
-            db.session.commit()
-            flash(f"{course_name} has been deleted", "success")
-            return redirect(url_for("admin.admin_panel"))
+            return redirect(request.referrer)
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))
@@ -78,7 +69,7 @@ def update_grades(course_id):
 def add_task(course_id):
     if request.method == "POST":
         course_to_add = Course.query.get(course_id)
-        teacher = course_to_add.course.lecturer
+        teacher = course_to_add.lecturer
         if "type" in session and "user_name" in session and course_to_add and teacher:
             if session["user_name"] == teacher.user_name or session["type"] == "admin":
                 title = request.form["title"]
@@ -99,8 +90,7 @@ def delete_task(task_id):
         if session["user_name"] == teacher.user_name or session["type"] == "admin":
             title = task_to_del.title
             course = task_to_del.course
-            db.session.delete(task_to_del)
-            db.session.commit()
+            task_to_del.delete_from_db()
             flash(f"Task '{title}' was successfully deleted from {course.course_name}", "success")
             return redirect(request.referrer)
 
@@ -116,9 +106,10 @@ def update_task(task_id):
     if "type" in session and "user_name" in session and task_to_update and teacher:
         if session["user_name"] == teacher.user_name or session["type"] == "admin":
             if request.method == "POST":
-                title = task_to_update.title
-                update_my_task(request.form["title"], request.form["content"], task_to_update)
-                flash(f"Task '{title}' in {task_to_update.course.course_name} has been successfully updated ", "success")
+                old_title = task_to_update.title
+                task_to_update.update(request.form["title"], request.form["content"])
+                flash(f"Task '{old_title}' in {task_to_update.course.course_name} has been successfully updated ",
+                      "success")
                 return redirect(url_for('courses.course_dashboard_teacher', course_id=course.id))
             else:
                 return render_template('update_task.html', course=course, task=task_to_update)
@@ -128,23 +119,40 @@ def update_task(task_id):
 
 @courses.route("/<int:course_id>/course_control/", methods=['POST', 'GET'])
 def course_dashboard_teacher(course_id):
-    course_to_view = Course.query.get(course_id)
-    teacher = Teacher.query.get(course_to_view.teacher_id)
-    tasks = Task.query.filter_by(course_id=course_id).order_by(Task.date_posted.desc()).all()
-    best_student = get_best_student(course_id)
-    if "type" in session and "user_name" in session and course_to_view:
-        if session["user_name"] == teacher.user_name or session["type"] == "admin":
-            if request.method == "POST":
-                pass  # todo edith later
-            else:
-                return render_template("course_dashboard_teacher.html",
-                                       course=course_to_view, tasks=tasks,
-                                       teacher=teacher, best_student=best_student)
+    if request.method == "POST":
+        pass  # todo edith later
+    else:
+        course_to_view = Course.query.get(course_id)
+        tasks = Task.query.filter_by(course_id=course_id).order_by(Task.date_posted.desc()).all()
+        best_student = get_best_student(course_id)
+        if "type" in session and "user_name" in session and course_to_view:
+            if session["user_name"] == course_to_view.lecturer.user_name or session["type"] == "admin":
+                return render_template("course_dashboard_teacher.html", course=course_to_view, tasks=tasks,
+                                       best_student=best_student)
+    flash("Page not found!", "warning")
+    return redirect(url_for("main.home"))
+
+
+@courses.route("/<int:course_id>/dashboard/<int:student_id>", methods=['POST', 'GET'])
+def course_dashboard_student(course_id, student_id):
+    if request.method == "POST":
+        pass  # todo edith later
+    else:
+        course_to_view = Course.query.get(course_id)
+        tasks = Task.query.filter_by(course_id=course_id).order_by(Task.date_posted.desc()).all()
+        best_student = get_best_student(course_id)
+        student = Student.query.get(student_id)
+
+        if "user_name" in session and course_to_view and student:
+            if student.user_name == session["user_name"]:
+                return render_template("course_dashboard_student.html", course=course_to_view,
+                                       tasks=tasks, best_student=best_student)
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))
 
 
+"""
 # todo delete after use it
 @courses.route("/<int:course_id>/view_course/")
 def course_tasks(course_id):
@@ -156,7 +164,7 @@ def course_tasks(course_id):
 
 #  todo delete courses.course_tasks template
 #  todo delete courses.course_grades template
-"""
+
 @courses.route("/<int:course_id>/add_task/", methods=['POST', 'GET']) 
 def add_task(course_id):
     course_to_add = Course.query.get(course_id)
