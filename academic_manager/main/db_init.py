@@ -1,5 +1,5 @@
 from academic_manager.models import Student, Teacher, Admin, Enrollment, Course, Task
-from academic_manager import db
+from academic_manager.extensions import db
 import random
 
 

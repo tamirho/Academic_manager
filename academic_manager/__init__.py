@@ -1,7 +1,6 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
-
+from academic_manager.extensions import db
 
 app = Flask(__name__)
 app.secret_key = "my secret"
@@ -10,7 +9,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 app.permanent_session_lifetime = timedelta(minutes=10)
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 from academic_manager.main.routes import main
 from academic_manager.admin.routes import admin

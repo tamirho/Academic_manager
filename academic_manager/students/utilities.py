@@ -1,5 +1,5 @@
 from academic_manager.models import Student, Enrollment, Course
-from academic_manager import db
+from academic_manager.extensions import db
 
 
 def make_new_enrollment(current_student, current_course):

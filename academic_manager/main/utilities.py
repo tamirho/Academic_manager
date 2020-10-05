@@ -1,7 +1,7 @@
 from flask import session
 from academic_manager.main.form_validation import *
 from academic_manager.models import Student, Teacher, Admin, Enrollment, Course, Task
-from academic_manager import db
+from academic_manager.extensions import db
 
 
 def clear_user_info_from_session():
