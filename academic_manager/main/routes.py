@@ -1,5 +1,5 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
-from academic_manager import db
+from academic_manager.extensions import db
 from academic_manager.main.utilities import *
 from academic_manager.students.utilities import *
 from datetime import datetime

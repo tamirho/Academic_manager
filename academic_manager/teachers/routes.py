@@ -1,5 +1,5 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
-from academic_manager import db
+from academic_manager.extensions import db
 from academic_manager.models import Teacher, Course, Enrollment
 from academic_manager.main.utilities import *
 
@@ -75,18 +75,14 @@ def delete_teacher(teacher_id):
 
     if "type" in session and teacher_to_del:
         if teacher_to_del.user_name == session["user_name"]:
-            Course.query.filter(Course.teacher_id == teacher_to_del.id).delete()
-            db.session.delete(teacher_to_del)
-            db.session.commit()
+            teacher_to_del.delete_from_db()
             flash("Your account has been deleted", "success")
             clear_user_info_from_session()  # todo check if session.clear() is better for me?
             return redirect(url_for("main.home"))
         elif session["type"] == "admin":
             flash(f"{teacher_to_del.user_name} has been deleted", "success")
-            Course.query.filter(Course.teacher_id == teacher_to_del.id).delete()
-            db.session.delete(teacher_to_del)
-            db.session.commit()
-            return redirect(url_for("admin.admin_panel"))
+            teacher_to_del.delete_from_db()
+            return redirect(url_for("admin.admin_teachers"))
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))

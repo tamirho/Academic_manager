@@ -1,5 +1,5 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
-from academic_manager import db
+from academic_manager.extensions import db
 from academic_manager.main.form_validation import *
 
 
@@ -65,8 +65,7 @@ def admin_search_panel():
         elif teacher:
             return redirect(url_for('teachers.watch_teacher', teacher_id=teacher.id))
         elif course:
-            return redirect(url_for('courses.view_course', course_id=course.id))
-            # todo change this url after build the view course page
+            return redirect(url_for('courses.course_dashboard_teacher', course_id=course.id))
 
         flash("There is no such value!", "warning")
         return redirect(request.referrer)
