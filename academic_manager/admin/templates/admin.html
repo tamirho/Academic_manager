@@ -10,15 +10,17 @@
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Password</th>
+            <th>Role</th>
+            <th>Gender</th>
             <th>Action</th>
           </tr>
 
           {% for student in student_list %}
               <tr>
-                <td>{{ student.user_name }}</td>
+                <td>{{ student.full_name }}</td>
                 <td>{{ student.email }}</td>
-                <td>{{ student.password }}</td>
+                <td>{{ student.role }}</td>
+                <td>{{ student.gender }}</td>
                 <td><a href="{{ url_for('students.watch_student', student_id=student.id) }}"
                        class="badge badge-primary">Watch</a>
                     <a href="#" class="badge badge-success">Update</a>
@@ -36,16 +38,18 @@
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Password</th>
+            <th>Role</th>
+            <th>Gender</th>
             <th colspan="2">Approval</th>
             <th>Action</th>
           </tr>
 
           {% for teacher in teacher_list %}
               <tr>
-                <td>{{ teacher.user_name }}</td>
+                <td>{{ teacher.full_name }}</td>
                 <td>{{ teacher.email }}</td>
-                <td>{{ teacher.password }}</td>
+                <td>{{ teacher.role }}</td>
+                <td>{{ teacher.gender }}</td>
                 <td>
                     {% if teacher.approved %}
                         True
@@ -90,9 +94,13 @@
           {% for course in courses_list %}
               <tr>
                 <td>{{ course.course_name }}</td>
-                <td>{{ course.lecturer.user_name }}</td>
+                <td>{{ course.lecturer.full_name }}</td>
                 <td>{% for enroll in course.enrollment %}
-                    {{ enroll.student.user_name }},
+                        {% if loop.index % 4 == 0 %}
+                            <br/>
+                        {% endif %}
+                        ({{ loop.index}}) {{ enroll.student.full_name }}
+
                     {% endfor %}
                 </td>
                 <td><a href="#" class="badge badge-primary">Watch</a>

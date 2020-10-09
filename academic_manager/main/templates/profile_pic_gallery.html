@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+    {% block title %}Pic a pic{% endblock %}
+{% block content %}
+<div class="card">
+    <h4 class="card-header">Pic a pic</h4>
+    <div class="card-body">
+        <div class="content-section">
+            
+            <div class="media">
+                <ul>
+                {% for pic_name in gallery_lst %}
+                    <li><img style="height: 125px; width: 125px; margin-right: 20px; margin-bottom: 16px;"
+                             src="{{ pic_name }}" alt="{{ pic_name }}"></li>
+
+                {% endfor %}</ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

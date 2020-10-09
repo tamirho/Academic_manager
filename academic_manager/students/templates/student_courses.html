@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-    {% block title %}{{ student.user_name }} Courses{% endblock %}
+    {% block title %}{{ student.first_name }}'s Courses{% endblock %}
 {% block content %}
+<div class="card">
     <h4 class="card-header">Manage Courses</h4>
     <div class="card-body">
         <br>
@@ -22,11 +23,11 @@
                         <td>{{ loop.index }}</td>
                         <th scope="row">{{ enrollment.course.course_name }}</th>
                         <td cope="row">{{ enrollment.grade }}</td>
-                        <td cope="row">{{ enrollment.course.lecturer.user_name }}</td>
+                        <td cope="row">{{ enrollment.course.lecturer.full_name }}</td>
                         <td cope="row">
                             <a href="{{ url_for('courses.course_dashboard_student', course_id=enrollment.course_id,
-                             student_id=student.id) }}" class="badge badge-info">Course Details</a>
-                            <a href="{{ url_for('students.remove_enrollment' ,student_id=enrollment.student_id,
+                             user_id=student.id) }}" class="badge badge-info">Course Details</a>
+                            <a href="{{ url_for('students.remove_enrollment' ,user_id=enrollment.student_id,
                             enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
 
                         </td>
@@ -36,5 +37,5 @@
         </table>
     </div>
 
-
+</div>
 {% endblock %}

@@ -2,63 +2,60 @@
 {% block title %}Home page{% endblock %}
 
 {% block content %}
+<div class="card">
+    <h5 class="card-header">Hey, {{ current_user.first_name if current_user.is_authenticated else "friend" }}!</h5>
 
-<h5 class="card-header">Hey, {{ session["user_name"] if "user_name" in session else "friend" }}!</h5>
+    <div class="card-body">
 
-<div class="card-body">
-
-    {% if session["type"] %}
-    <ul class="list-unstyled">
-        <li class="media">
-            <img src="{{ url_for('static', filename='/images/813810.png') }}"
-                 class="align-self-center mr-3" width="200" height="170" alt="students">
-            <div class="media-body">
-                <h5 class="mt-3">Remarks by the Chairman of the Student Association</h5>
-                <p>Hey everyone!! My name is Hadar and I am a senior from Nashville, TN.
-                    I study Government with a secondary in Educational Studies and a language citation in Spanish.
-                    I have worked in the Admissions Office with the Undergraduate Admissions Council (UAC) for all 4
-                    years of college!
-                <p>When I am not working, you can usually find me hanging out with my blockmates (who are my best
-                    friends),eating cheese, or spending time with young people through mentoring and tutoring programs!
-                    On-campus, I am a member of Harvard Model Congress and the Asian American Womxn's Association.</p>
-            </div>
-        </li>
-        <br>
-        {% if best_student and best_student.avg() > 85 %}
-        <li class="media">
-            <div class="media-body">
-                <h5 class="mt-4">Outstanding student this month</h5>
-                <p>Name: {{ best_student.user_name }} | Avg: {{ '%0.2f' % best_student.avg()|float }}</p>
-                <p>Congratulations to {{ best_student.user_name }} who received the best average for
-                    {{ current_date.strftime('%B')}} and for that he received the Outstanding Student
-                    Award of the month.</p><strong>Rise and Succeed!</strong>
-
-            </div>
-            <img src="{{ url_for('static', filename='/images/graduate-cap.jpg') }}"
-                 class="ml-3" width="310" height="230" alt="graduate-cap">
-        </li>
-        {% endif %}
-    </ul>
-
-    {% else %}
-    <h5 class="card-title"></h5>
-    <p class="card-text"></p>
-
-
-    <div class="media">
-            <div class="media-body">
-                <h5 class="mt-4">Welcome To the Academic Manager</h5>
-                <p>Please Login\Sign-up with the Academic's email address.</p>
-                <div class="mt-4">
-                    <a href="{{ url_for('main.login') }}" class="btn btn-info mt-4">Login</a>
-                    <a href="{{ url_for('main.sign_up') }}" class="btn btn-warning mt-4">Register</a>
+        {% if current_user.is_authenticated %}
+        <ul class="list-unstyled">
+            <li class="media">
+                <img src="{{ url_for('static', filename='/images/813810.png') }}"
+                     class="align-self-center mr-3" width="200" height="170" alt="students">
+                <div class="media-body">
+                    <h5 class="mt-3">Remarks by the Chairman of the Student Association</h5>
+                    <p>Hey everyone!! My name is Hadar and I am a senior from Nashville, TN.
+                        I study Government with a secondary in Educational Studies and a language citation in Spanish.
+                        I have worked in the Admissions Office with the Undergraduate Admissions Council (UAC) for all 4
+                        years of college!
+                    <p>When I am not working, you can usually find me hanging out with my blockmates (who are my best
+                        friends),eating cheese, or spending time with young people through mentoring and tutoring programs!
+                        On-campus, I am a member of Harvard Model Congress and the Asian American Womxn's Association.</p>
                 </div>
+            </li>
+            <br>
+            {% if best_student and best_student.avg() > 85 %}
+            <li class="media">
+                <div class="media-body">
+                    <h5 class="mt-4">Outstanding student this month</h5>
+                    <p>Name: {{ best_student.full_name }} | Avg: {{ '%0.2f' % best_student.avg()|float }}</p>
+                    <p>Congratulations to {{ best_student.first_name }} who received the best average for
+                        {{ current_date.strftime('%B')}} and for that he received the Outstanding Student
+                        Award of the month.</p><strong>Rise and Succeed!</strong>
+
+                </div>
+                <img src="{{ url_for('static', filename='/images/graduate-cap.jpg') }}"
+                     class="ml-3" width="310" height="230" alt="graduate-cap">
+            </li>
+            {% endif %}
+        </ul>
+
+        {% else %}
+
+        <div class="media">
+                <div class="media-body">
+                    <h5 class="mt-4">Welcome To the Academic Manager</h5>
+                    <p>Please Login\Sign-up with the Academic's email address.</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('main.login') }}" class="btn btn-info mt-4">Login</a>
+                        <a href="{{ url_for('main.register') }}" class="btn btn-warning mt-4">Register</a>
+                    </div>
+                </div>
+                <img src="{{ url_for('static', filename='/images/book.jpg') }}"
+                     class="mr-5" width="250" height="250" alt="graduate-cap">
             </div>
-            <img src="{{ url_for('static', filename='/images/book.jpg') }}"
-                 class="mr-5" width="250" height="250" alt="graduate-cap">
-        </div>
 
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
-
 {% endblock %}

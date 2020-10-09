@@ -1,14 +1,20 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
-from academic_manager.extensions import db
+from flask_login import login_user, current_user, logout_user, login_required
+from academic_manager.extensions import db, bcrypt, restricted
+from academic_manager.models import User
+from academic_manager.forms import RegistrationForm, LoginForm, UpdateUserForm
 from academic_manager.main.utilities import *
 from academic_manager.students.utilities import *
 from datetime import datetime
+from academic_manager.main.db_init import init_db
 
 main = Blueprint('main', __name__, template_folder="templates")
 
 
 @main.route("/")
+@main.route("/home/")
 def home():
+    # init_db()
     best_student = get_best_student()
     current_date = datetime.now()
     return render_template("home.html", best_student=best_student, current_date=current_date)
@@ -16,74 +22,96 @@ def home():
 
 @main.route("/login/", methods=['POST', 'GET'])
 def login():
-    if request.method == "POST":
-        session.permanent = True
-        user_name = request.form["user_name"]
-        user_password = request.form["user_password"]
-        user_type = user_authentication(user_name, user_password)
-        if user_type == "disapproved":
-            flash("You have not received approval from the admin", "warning")
-            return redirect(url_for("main.login"))
-        elif not user_type == "none":
-            session["user_name"] = user_name
-            session["type"] = user_type
-            flash("Logged in successfully!", "success")
-            return redirect(url_for("main.home"))
-        else:
-            flash("The username or password is invalid", "danger")
-            return redirect(url_for("main.login"))
-    else:
-        if "user_name" in session:
-            flash("Already logged in!", "warning")
-            return redirect(url_for("main.user"))
-        return render_template("login.html")
-
-
-@main.route("/sign-up/", methods=['POST', 'GET'])
-def sign_up():
-    if request.method == "POST":
-        user_name = request.form["user_name"]
-        user_email = request.form["user_email"]
-        user_password = request.form["user_password"]
-        password_confirmation = request.form["password_confirmation"]
-        user_type = request.form["user_type"]
-        check_flag, messages = sign_up_validation(user_name, user_email, user_password, password_confirmation)
-        if check_flag:
-            make_new_user(user_name, user_email, user_password, user_type)
-            flash("Sign up successfully! you can login now", "info")
-            return redirect(url_for("main.login"))
-        else:
-            for message in messages:
-                flash(message, "danger")
-            return redirect(url_for("main.sign_up"))
-    else:
-        if "user_name" in session:
-            flash("Already logged in!", "warning")
-            return redirect(url_for("main.user"))
-        return render_template("sign_up.html")
-
-
-@main.route("/user/")
-def user():
-
-    if "type" in session:
-        user_name = session["user_name"]
-        if session["type"] == "admin":
-            return redirect(url_for("admin.admin_panel"))
-        elif session["type"] == "teacher":
-            return redirect(url_for("teachers.teacher", user_name=user_name))
-        else:
-            return redirect(url_for("students.student", user_name=user_name))
-    else:
-        flash("You need to login first", "danger")
+    if current_user.is_authenticated:
+        flash("Already logged in!", "warning")
         return redirect(url_for("main.home"))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data.lower()).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            session.permanent = True  # todo delete if not need session
+            flash("Logged in successfully!", "success")
+            return redirect(next_page) if next_page else redirect(url_for("main.home"))
+        else:
+            flash("The Email or Password is invalid", "danger")
+            return redirect(url_for("main.login", form=form))
+
+    return render_template("login.html", form=form)
+
+
+@main.route("/register/", methods=['POST', 'GET'])
+def register():
+    if current_user.is_authenticated:
+        flash("Already logged in!", "warning")
+        return redirect(url_for("main.home"))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        make_new_user(form.email.data, form.first_name.data, form.last_name.data,
+                      hashed_password, form.gender.data, form.role.data)
+        flash(f'Account created for {form.first_name.data}! You can login now', 'success')
+        return redirect(url_for('main.login'))
+
+    return render_template('register.html', form=form)
 
 
 @main.route("/logout/")
+@login_required
 def logout():
-    if "user_name" in session:
-        user_name = session["user_name"]
-        flash(f"{user_name}, you logged out successfully!", "success")
-        clear_user_info_from_session()  # todo check if session.clear() is better for me?
+    current_user.update_last_seen()
+    logout_user()
     return redirect(url_for("main.home"))
 
+
+@main.route("/profile/")
+@login_required
+def profile():
+    image_file = url_for('static', filename='profile_pics/' + current_user.profile_img)
+    return render_template('profile.html', image_file=image_file)
+
+
+@main.route("/update/<int:user_id>/", methods=['POST', 'GET'])
+@restricted(role=["admin", "current_user"])
+def update_user_profile(user_id):
+    form = UpdateUserForm()
+    user = User.query.get_or_404(user_id)
+    if form.validate_on_submit():
+
+        if form.picture.data:
+
+            # Resize and save picture in users folder
+            pic_file = save_picture(form.picture.data)
+
+            # Removes the previous image from the repository
+            remove_profile_picture(user.profile_img)
+            user.profile_img = pic_file
+
+        name = user.first_name
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
+        user.email = form.email.data
+        user.gender = form.gender.data
+        db.session.commit()
+
+        flash(f"{name}'s profile has been updated!", 'success')
+        return redirect(url_for('main.profile'))
+
+    elif request.method == 'GET':
+        form.first_name.data = user.first_name
+        form.last_name.data = user.last_name
+        form.email.data = user.email
+        form.gender.data = user.gender
+
+    return render_template('update_user_profile.html', user=user, form=form)
+
+
+# todo create an option to choose one of the pictures from the default folder
+@main.route("/profile_pic_gallery/")
+@login_required
+def get_profile_picture_gallery():
+    item_lst = os.listdir(os.path.join(app.root_path, 'static/profile_pics/default'))
+    gallery_lst = [url_for('static', filename='profile_pics/default/' + item) for item in item_lst]
+    print(gallery_lst)
+    return render_template('profile_pic_gallery.html', gallery_lst=gallery_lst)

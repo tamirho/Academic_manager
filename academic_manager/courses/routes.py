@@ -133,8 +133,8 @@ def course_dashboard_teacher(course_id):
     return redirect(url_for("main.home"))
 
 
-@courses.route("/<int:course_id>/dashboard/<int:student_id>", methods=['POST', 'GET'])
-def course_dashboard_student(course_id, student_id):
+@courses.route("/<int:course_id>/dashboard/<int:user_id>", methods=['POST', 'GET'])
+def course_dashboard_student(course_id, user_id):
     if request.method == "POST":
         pass  # todo edith later
     else:
@@ -152,8 +152,8 @@ def course_dashboard_student(course_id, student_id):
     return redirect(url_for("main.home"))
 
 
-"""
 # todo delete after use it
+"""
 @courses.route("/<int:course_id>/view_course/")
 def course_tasks(course_id):
     course_to_view = Course.query.get(course_id)

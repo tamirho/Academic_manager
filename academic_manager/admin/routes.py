@@ -1,7 +1,6 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
 from academic_manager.extensions import db
-from academic_manager.main.form_validation import *
-
+from academic_manager.models import *
 
 admin = Blueprint('admin', __name__, template_folder="templates", url_prefix="/admin")
 

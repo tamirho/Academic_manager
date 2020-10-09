@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+    {% block title %}{{ current_user.first_name }}'s Profile{% endblock %}
+{% block content %}
+<div class="card">
+    <h4 class="card-header">My Profile</h4>
+    <div class="card-body">
+        <div class="content-section">
+            
+            <div class="media">
+                <img class="rounded-circle" style="height: 125px; width: 125px; margin-right: 20px; margin-bottom: 16px;"
+                     src="{{ image_file }}" alt="profile picture">
+                <div class="media-body">
+                    <h2 class="account-heading">{{ current_user.full_name }}</h2>
+                    <p class="text-secondary">{{ current_user.email }}
+                    <br>{{ current_user.gender }}, {{ current_user.role }}
+                    <br>Last Seen at {{ current_user.last_seen.strftime('%H:%M %b %d, %Y') }}</p>
+                    <a href="#"
+                       class="badge badge-dark">Change Password</a>
+                    <a href="{{ url_for('main.update_user_profile', user_id=current_user.id ) }}"
+                       class="badge badge-success">Update</a>
+                    <a href="#"
+                       class="badge badge-danger">Delete</a>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}
