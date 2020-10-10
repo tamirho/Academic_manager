@@ -1,5 +1,5 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint
-from academic_manager.extensions import db
+from academic_manager.extensions import db, restricted
 from academic_manager.models import *
 
 admin = Blueprint('admin', __name__, template_folder="templates", url_prefix="/admin")
@@ -15,42 +15,42 @@ def admin_panel():
 
 
 @admin.route("/admin_students/")
+@restricted(role=["admin"])
 def admin_students():
     student_list = Student.query.all()
     return render_template("admin_students.html", student_list=student_list)
 
 
 @admin.route("/admin_teachers/")
+@restricted(role=["admin"])
 def admin_teachers():
     teacher_list = Teacher.query.all()
     return render_template("admin_teachers.html", teacher_list=teacher_list)
 
 
 @admin.route("/admin_courses/")
+@restricted(role=["admin"])
 def admin_courses():
-    courses_list = Course.query.all()
+    courses_list = Course.query.order_by(Course.course_name).all()
     return render_template("admin_courses.html", courses_list=courses_list)
 
 
-@admin.route("/teacher_approval/<string:action>/<int:teacher_id>/")
-def teacher_approval(teacher_id, action):
-    current_teacher = Teacher.query.get(teacher_id)
-    if "type" in session and current_teacher:
-        if session["type"] == "admin":
-            if action == "approve":
-                current_teacher.approved = True
-                flash(f"{current_teacher.user_name} has been approved", "success")
-            elif action == "disapprove":
-                current_teacher.approved = False
-                flash(f"{current_teacher.user_name} has been disapproved", "warning")
-            db.session.commit()
-            return redirect(request.referrer)
-
-    flash("Page not found!", "warning")
-    return redirect(url_for("main.home"))
+@admin.route("/teacher_approval/<string:action>/<int:user_id>/")
+@restricted(role=["admin"])
+def teacher_approval(user_id, action):
+    current_teacher = Teacher.query.get(user_id)
+    if action == "approve":
+        current_teacher.approved = True
+        flash(f"{current_teacher.email} has been approved", "success")
+    elif action == "disapprove":
+        current_teacher.approved = False
+        flash(f"{current_teacher.email} has been disapproved", "warning")
+    db.session.commit()
+    return redirect(request.referrer)
 
 
 @admin.route("/search=?/", methods=['POST'])
+@restricted(role=["admin"])
 def admin_search_panel():
     # todo can add smarter filters to search in db
     if request.method == "POST":

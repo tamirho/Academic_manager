@@ -1,62 +1,63 @@
 {% extends "base.html" %}
-{% block title %}Watch {{ student.user_name }}{% endblock %}
+{% block title %}Watch {{ student.full_name }}{% endblock %}
 {% block content %}
-<h4 class="card-header">{{ student.user_name }} Profile</h4>
-<div class="card-body">
-    <h5>Details:</h5>
-    <table class="table" style="width:100%">
-        <thead>
-        <tr>
-            <th>User Name</th>
-            <th>Email</th>
-                    <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>{{ student.full_name }}</td>
-            <td>{{ student.email }}</td>
-                    <td>
-                        <a href="#"
-                           class="badge badge-success">Update</a>
-                        <a href="{{ url_for('students.delete_student', student_id=student.id) }}"
-                           class="badge badge-danger">Delete</a>
-                    </td>
-        </tr>
-        </tbody>
-    </table>
-    <br><br>
-    <div>
-        <h5>Courses:</h5>
+<div class="card">
+    <h4 class="card-header">{{ student.full_name }} Profile</h4>
+    <div class="card-body">
+        <h5>Details:</h5>
         <table class="table" style="width:100%">
             <thead>
             <tr>
-                <th>#</th>
-                <th>Course Name</th>
-                <th>Grade</th>
-                <th>Lecturer</th>
+                <th>Full Name</th>
+                <th>Email</th>
                 <th>Action</th>
-
-
             </tr>
             </thead>
             <tbody>
-            {% for enrollment in student.enrollment %}
             <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ enrollment.course.course_name }}</td>
-                <td>{{ enrollment.grade }}</td>
-                <td>{{ enrollment.course.lecturer.user_name }}</td>
-                <th><a href="#" class="badge badge-info">Watch Progress</a>
-                    <a href="{{ url_for('students.remove_enrollment', student_id=student.id,
-                            enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
-
-                </th>
+                <td>{{ student.full_name }}</td>
+                <td>{{ student.email }}</td>
+                        <td>
+                            <a href="#"
+                               class="badge badge-success">Update</a>
+                            <a href="{{ url_for('main.delete_user', user_id=student.id) }}"
+                               class="badge badge-danger">Delete</a>
+                        </td>
             </tr>
-            {% endfor %}
             </tbody>
         </table>
+        <br><br>
+        <div>
+            <h5>Courses:</h5>
+            <table class="table" style="width:100%">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Course Name</th>
+                    <th>Grade</th>
+                    <th>Lecturer</th>
+                    <th>Action</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for enrollment in student.enrollment %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ enrollment.course.course_name }}</td>
+                    <td>{{ enrollment.grade }}</td>
+                    <td>{{ enrollment.course.lecturer.full_name }}</td>
+                    <th><a href="#" class="badge badge-info">Watch Progress</a>
+                        <a href="{{ url_for('students.remove_enrollment', user_id=student.id,
+                                enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
+
+                    </th>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
 {% endblock %}

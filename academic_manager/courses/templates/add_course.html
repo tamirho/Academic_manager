@@ -1,13 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Add Course{% endblock %}
 {% block content %}
-
+<div class="card">
     <h5 class="card-header">Add Course</h5>
     <div class="card-body">
-
         <form action="#" method="post">
+            {{ form.hidden_tag() }}
+
+            <fieldset class="form-group">
+
+                <!-- Teacher Name -->
+                <div class="form-group">
+                    <div>{{ form.teacher.label(class="form-control-label") }}:</div>
+                    {{ form.teacher(class="form-control-label", value=lst) }}
+                </div>
+
+                <!-- Course Name -->
+                <div class="form-group">
+                    {{ form.course.label(class="form-control-label") }}
+                    {% if form.course.errors %}
+                        {{ form.course(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.course.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.course(class="form-control") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+
+            <!-- Submit -->
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+
+        </form>
+
+
+        <!--form action="#" method="post">
             <div class="form-group col-md-4">
-              {% if "type" in session %}
+              {% if current_user.is_admin %}
                   {% if session["type"] == "admin" %}
                       <label for="inputTeacher">Choose Teacher:</label>
                       <select name="teacher_name" id="inputTeacher" class="form-control">
@@ -29,8 +63,8 @@
             </div>
             <br>
             <button type="submit" value="submit" class="btn btn-primary">Submit</button>
-        </form>
+        </form-->
 
     </div>
-
+</div>
 {% endblock %}

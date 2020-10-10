@@ -1,6 +1,7 @@
 from flask import redirect, url_for, render_template, request, session, flash, Blueprint, abort
 from flask_login import current_user, login_required
 from academic_manager.extensions import db, restricted
+from academic_manager.forms import NewEnrollmentForm
 from academic_manager.models import Student, Enrollment, Course
 from academic_manager.main.utilities import *
 from academic_manager.students.utilities import *
@@ -13,24 +14,6 @@ def student():
     return redirect(url_for("main.home"))
 
 
-@students.route("/<int:student_id>/delete_student/")
-def delete_student(student_id):
-    student_to_del = Student.query.get(student_id)
-
-    if "type" in session and student_to_del:
-        if student_to_del.user_name == session["user_name"]:
-            student_to_del.delete_from_db()
-            flash("Your account has been deleted", "success")
-            return redirect(url_for("main.home"))
-        elif session["type"] == "admin":
-            flash(f"{student_to_del.user_name} has been deleted", "success")
-            student_to_del.delete_from_db()
-            return redirect(url_for("admin.admin_students"))
-
-    flash("Page not found!", "warning")
-    return redirect(url_for("main.home"))
-
-
 @students.route("/manage_courses/")
 @restricted(role=["student"])
 def manage_courses_student():
@@ -40,24 +23,26 @@ def manage_courses_student():
 @students.route("/new_enrollment/", methods=['POST', 'GET'])
 @restricted(role=["student"])
 def new_enrollment():
+    form = NewEnrollmentForm()
+
+    # create courses to enroll list for the Select Field (choices)
     current_courses_id_lst = current_user.get_courses_id_lst()
-    courses_to_enroll = [course for course in Course.query.all()
+    courses_to_enroll = [(course.id, course.course_name + " (" + course.lecturer.full_name + ")")
+                         for course in Course.query.all()
                          if course.id not in current_courses_id_lst]
-    if request.method == "POST":
-        course_name = request.form["course_name"]
-        current_course = Course.query.filter_by(course_name=course_name).first()
-        if current_course:
-            if current_course.id not in current_courses_id_lst:
-                make_new_enrollment(student_profile, current_course)
-                flash(f"You have successfully enrolled for {course_name}", "success")
-            else:
-                flash(f"There was a problem registering, please try again later", "warning")
-            return render_template("student_courses.html", student=student_profile)
-        else:
-            flash(f"Please choose course before you submit", "warning")
-            return render_template("new_enrollment.html", student=student_profile, courses=courses_to_enroll)
-    else:
-        return render_template("new_enrollment.html", student=student_profile, courses=courses_to_enroll)
+    courses_to_enroll.insert(0, ('0', "Choose Course:"))
+
+    if request.method == "GET":
+        form.enrollment.choices = courses_to_enroll
+        return render_template("new_enrollment.html", form=form, courses=courses_to_enroll)
+
+    if form.validate_on_submit():
+        course_id = form.enrollment.data
+        course = Course.query.get(course_id)
+        make_new_enrollment(current_user.id, course_id)
+        flash(f"You have successfully enrolled for {course.course_name} ", "success")
+
+    return redirect(url_for('students.new_enrollment'))
 
 
 @students.route("/remove_enrollment/<int:user_id>/<int:enrollment_id>")
@@ -75,8 +60,9 @@ def remove_enrollment(user_id, enrollment_id):
             return redirect(request.referrer)
 
 
-@students.route("/watch/<int:student_id>")
-def watch_student(student_id):
-    student_profile = Student.query.filter_by(id=student_id).first()
+@students.route("/watch/<int:user_id>")
+@restricted(role=["admin", "teacher"])
+def watch_student(user_id):
+    student_profile = Student.query.filter_by(id=user_id).first_or_404()
     return render_template("watch_student.html", student=student_profile)
 

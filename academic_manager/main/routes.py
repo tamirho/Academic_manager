@@ -25,18 +25,28 @@ def login():
     if current_user.is_authenticated:
         flash("Already logged in!", "warning")
         return redirect(url_for("main.home"))
+
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data.lower()).first()
+
+        # Validate the password if the user exist
         if user and bcrypt.check_password_hash(user.password, form.password.data):
+
+            # Check if teacher ia approved by the admin
+            if user.is_teacher and not user.approved:
+                flash(f"{user.email} is not approved yet by the admin", "danger")
+                return redirect(url_for("main.home"))
+
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             session.permanent = True  # todo delete if not need session
             flash("Logged in successfully!", "success")
             return redirect(next_page) if next_page else redirect(url_for("main.home"))
+
         else:
             flash("The Email or Password is invalid", "danger")
-            return redirect(url_for("main.login", form=form))
+            return redirect(url_for("main.login"))
 
     return render_template("login.html", form=form)
 
@@ -47,6 +57,7 @@ def register():
         flash("Already logged in!", "warning")
         return redirect(url_for("main.home"))
     form = RegistrationForm()
+
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         make_new_user(form.email.data, form.first_name.data, form.last_name.data,
@@ -79,6 +90,7 @@ def update_user_profile(user_id):
     user = User.query.get_or_404(user_id)
     if form.validate_on_submit():
 
+        # Profile picture handling
         if form.picture.data:
 
             # Resize and save picture in users folder
@@ -115,3 +127,22 @@ def get_profile_picture_gallery():
     gallery_lst = [url_for('static', filename='profile_pics/default/' + item) for item in item_lst]
     print(gallery_lst)
     return render_template('profile_pic_gallery.html', gallery_lst=gallery_lst)
+
+
+@main.route("/delete_user/<int:user_id>")
+@restricted(role=["admin", "current_user"])
+def delete_user(user_id):
+    user_to_del = User.query.get_or_404(user_id)
+
+    # User deleting his profile
+    if current_user.id == user_id:
+        logout_user()
+        user_to_del.delete_from_db()
+        flash("Your account has been deleted", "success")
+        return redirect(url_for("main.home"))
+
+    # Admin deleting other user profile
+    if current_user.is_admin:
+        flash(f"{user_to_del.email} has been deleted", "success")
+        user_to_del.delete_from_db()
+        return redirect(request.referrer)

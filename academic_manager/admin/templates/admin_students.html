@@ -1,35 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Admin Page - Students{% endblock %}
 {% block content %}
-    <h5 class="card-header">Admin Panel</h5>
+<div class="card">
+    <h5 class="card-header">Admin Panel - Manage Students:</h5>
     <div class="card-body">
-        <table style="width:100%">
-          <tr>
-              <th colspan="4"><h2>Manage Students:</h2></th>
-          </tr>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Password</th>
-            <th>Action</th>
-          </tr>
-
-          {% for student in student_list %}
-              <tr>
-                <td>{{ student.user_name }}</td>
-                <td>{{ student.email }}</td>
-                <td>{{ student.password }}</td>
-                <td><a href="{{ url_for('students.watch_student', student_id=student.id) }}"
-                       class="badge badge-primary">Watch</a>
-                    <a href="{{ url_for('students.update_student', student_id=student.id) }}"
-                       class="badge badge-success">Update</a>
-                    <a href="{{ url_for('students.delete_student', student_id=student.id) }}"
-                       class="badge badge-danger">Delete</a>
-                </td>
-              </tr>
-          {% endfor %}
+        <table class="table" style="width:100%">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for student in student_list %}
+                <tr>
+                    <td scope="row">{{ loop.index }}</td>
+                    <td scope="row">{{ student.full_name }}</td>
+                    <td scope="row">{{ student.email }}</td>
+                    <td scope="row">{{ student.gender }}</td>
+                    <td scope="row"><a href="{{ url_for('students.watch_student', user_id=student.id) }}"
+                           class="badge badge-primary">Watch</a>
+                        <a href="{{ url_for('main.update_user_profile', user_id=student.id) }}"
+                           class="badge badge-success">Update</a>
+                        <a href="{{ url_for('main.delete_user', user_id=student.id) }}"
+                           class="badge badge-danger">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
         <br><br>
 
     </div>
+</div>
 {% endblock %}

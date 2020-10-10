@@ -75,6 +75,10 @@ class Admin(User):
     def __repr__(self):
         return f"Admin('{self.email}')"
 
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Teacher(User):
     __table_name__ = 'teacher'
@@ -96,6 +100,12 @@ class Teacher(User):
     def __repr__(self):
         return f"Teacher('{self.email}','{self.full_name}','{self.gender}','{self.approved}')"
 
+    def delete_from_db(self):
+        for course in Course.query.filter(Course.teacher_id == self.id):
+            course.delete_from_db()
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Student(User):
     __table_name__ = 'student'
@@ -115,6 +125,11 @@ class Student(User):
 
     def __repr__(self):
         return f"Student('{self.email}','{self.full_name}','{self.gender}')"
+
+    def delete_from_db(self):
+        Enrollment.query.filter(Enrollment.student_id == self.id).delete()
+        db.session.delete(self)
+        db.session.commit()
 
     def avg(self):
         grade_list = [int(enroll.grade) for enroll in self.enrollment if enroll.grade]
@@ -170,6 +185,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    file = db.Column(db.LargeBinary)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_time = db.Column(db.DateTime, nullable=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
@@ -178,7 +194,6 @@ class Task(db.Model):
         self.title = title
         self.content = content
         self.course_id = course_id
-        self.date_posted = datetime.now()
 
     def __repr__(self):
         if self.update_time:
@@ -199,71 +214,3 @@ class Task(db.Model):
     def add_update_time(self):
         self.update_time = datetime.now()
 
-
-"""
-class Admin(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_name = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
-
-    def __init__(self, user_name, password):
-        self.user_name = user_name
-        self.password = password
-
-    def __repr__(self):
-        return f"Admin('{self.user_name}','{self.password}')"
-
-    def delete_from_db(self):
-        db.session.delete(self)
-        db.session.commit()
-
-class Student(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_name = db.Column(db.String(30), nullable=False, unique=True)
-    email = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String(60), nullable=False)
-    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    enrollment = db.relationship('Enrollment', backref='student', lazy=True)
-
-    def __init__(self, user_name, email, password):
-        self.user_name = user_name
-        self.email = email
-        self.password = password
-
-    def __repr__(self):
-        return f"Student('{self.user_name}','{self.email}','{self.password}')"
-
-    def delete_from_db(self):
-        Enrollment.query.filter(Enrollment.student_id == self.id).delete()
-        db.session.delete(self)
-        db.session.commit()
-
-
-
-
-
-class Teacher(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_name = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
-    creation_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    last_seen = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    approved = db.Column(db.Boolean, default=False, nullable=False)
-    course = db.relationship('Course', backref='lecturer', lazy=True)
-
-    def __init__(self, user_name, email, password):
-        self.user_name = user_name
-        self.email = email
-        self.password = password
-
-    def __repr__(self):
-        return f"Teacher('{self.user_name}','{self.email}','{self.password}','{self.approved}')"
-
-    def delete_from_db(self):
-        for course in Course.query.filter(Course.teacher_id == self.id):
-            course.delete_from_db()
-        db.session.delete(self)
-        db.session.commit()
-"""

@@ -21,10 +21,10 @@
                 <td>{{ student.email }}</td>
                 <td>{{ student.role }}</td>
                 <td>{{ student.gender }}</td>
-                <td><a href="{{ url_for('students.watch_student', student_id=student.id) }}"
+                <td><a href="{{ url_for('students.watch_student', user_id=student.id) }}"
                        class="badge badge-primary">Watch</a>
                     <a href="#" class="badge badge-success">Update</a>
-                    <a href="{{ url_for('students.delete_student', student_id=student.id) }}"
+                    <a href="{{ url_for('main.delete_user', user_id=student.id) }}"
                        class="badge badge-danger">Delete</a>
                 </td>
               </tr>
@@ -60,19 +60,19 @@
 
                  <td>
                     {% if teacher.approved %}
-                        <a href="{{ url_for('admin.teacher_approval', teacher_id=teacher.id, action='disapprove') }}"
+                        <a href="{{ url_for('admin.teacher_approval', user_id=teacher.id, action='disapprove') }}"
                            class="badge badge-warning">Disapprove</a>
                     {% else %}
-                        <a href="{{ url_for('admin.teacher_approval' ,teacher_id=teacher.id, action='approve') }}"
+                        <a href="{{ url_for('admin.teacher_approval' ,user_id=teacher.id, action='approve') }}"
                            class="badge badge-info">Approve</a>
                     {% endif %}
                  </td>
                  <td>
-                    <a href="{{ url_for('teachers.watch_teacher', teacher_id=teacher.id) }}"
+                    <a href="{{ url_for('teachers.watch_teacher', user_id=teacher.id) }}"
                        class="badge badge-primary">Watch</a>
-                    <a href="{{ url_for('teachers.update_teacher', teacher_id=teacher.id) }}"
+                    <a href="{{ url_for('main.update_user_profile', user_id=teacher.id) }}"
                        class="badge badge-success">Update</a>
-                    <a href="{{ url_for('teachers.delete_teacher', teacher_id=teacher.id) }}"
+                    <a href="{{ url_for('main.delete_user', user_id=teacher.id) }}"
                        class="badge badge-danger">Delete</a>
                 </td>
               </tr>

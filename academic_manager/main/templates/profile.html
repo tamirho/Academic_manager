@@ -16,9 +16,9 @@
                     <br>Last Seen at {{ current_user.last_seen.strftime('%H:%M %b %d, %Y') }}</p>
                     <a href="#"
                        class="badge badge-dark">Change Password</a>
-                    <a href="{{ url_for('main.update_user_profile', user_id=current_user.id ) }}"
+                    <a href="{{ url_for('main.update_user_profile', user_id=current_user.id) }}"
                        class="badge badge-success">Update</a>
-                    <a href="#"
+                    <a href="{{ url_for('main.delete_user', user_id=current_user.id) }}"
                        class="badge badge-danger">Delete</a>
                 </div>
             </div>

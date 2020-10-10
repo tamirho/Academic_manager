@@ -6,6 +6,7 @@ from academic_manager.main.utilities import *
 teachers = Blueprint('teachers', __name__, template_folder="templates", url_prefix="/teachers")
 
 
+# todo this
 @teachers.route("/")
 def teacher():
     teacher_profile = Teacher.query.filter_by(user_name=session["user_name"]).first()
@@ -17,8 +18,9 @@ def teacher():
     return redirect(url_for("main.home"))
 
 
-@teachers.route("/<int:teacher_id>/update_teacher/", methods=['POST', 'GET'])
-def update_teacher(teacher_id):
+# todo this
+@teachers.route("/<int:user_id>/update_teacher/", methods=['POST', 'GET'])
+def update_teacher(user_id):
     teacher_to_update = Teacher.query.get(teacher_id)
     if "type" in session and teacher_to_update:
         if request.method == "POST":
@@ -45,6 +47,7 @@ def update_teacher(teacher_id):
             return render_template("update_user_profile.html", user=teacher_to_update)
 
 
+# todo this
 @teachers.route("/<int:teacher_id>/change_password/", methods=['POST', 'GET'])
 def change_teacher_password(teacher_id):
     teacher_to_update = Teacher.query.get(teacher_id)
@@ -69,36 +72,19 @@ def change_teacher_password(teacher_id):
     return redirect(url_for("main.home"))
 
 
-@teachers.route("/<int:teacher_id>/delete_teacher/")
-def delete_teacher(teacher_id):
-    teacher_to_del = Teacher.query.get(teacher_id)
-
-    if "type" in session and teacher_to_del:
-        if teacher_to_del.user_name == session["user_name"]:
-            teacher_to_del.delete_from_db()
-            flash("Your account has been deleted", "success")
-            clear_user_info_from_session()  # todo check if session.clear() is better for me?
-            return redirect(url_for("main.home"))
-        elif session["type"] == "admin":
-            flash(f"{teacher_to_del.user_name} has been deleted", "success")
-            teacher_to_del.delete_from_db()
-            return redirect(url_for("admin.admin_teachers"))
-
-    flash("Page not found!", "warning")
-    return redirect(url_for("main.home"))
-
-
-@teachers.route("/watch/<int:teacher_id>")
-def watch_teacher(teacher_id):
+# todo this
+@teachers.route("/watch/<int:user_id>")
+def watch_teacher(user_id):
     if "type" in session:
         if session["type"] == "admin":
-            teacher_profile = Teacher.query.filter_by(id=teacher_id).first()
+            teacher_profile = Teacher.query.filter_by(id=user_id).first()
             return render_template("watch_teacher.html", teacher=teacher_profile)
 
     flash("Page not found!", "warning")
     return redirect(url_for("main.home"))
 
 
+# todo this
 @teachers.route("/manage_courses/")
 def manage_courses_teacher():
     teacher_profile = Teacher.query.filter_by(user_name=session["user_name"]).first()
