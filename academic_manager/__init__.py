@@ -17,7 +17,7 @@ bcrypt.init_app(app)
 login_manager.init_app(app)
 login_manager.login_view = 'main.login'
 login_manager.login_message_category = 'danger'
-
+app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
 from academic_manager.main.routes import main
 from academic_manager.admin.routes import admin
@@ -30,4 +30,3 @@ app.register_blueprint(admin)
 app.register_blueprint(students)
 app.register_blueprint(teachers)
 app.register_blueprint(courses)
-

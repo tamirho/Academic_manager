@@ -11,125 +11,220 @@
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
           crossorigin="anonymous">
 
-    <!--link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}"-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
 
     <title>{% block title %}{% endblock %}</title>
+    <style type="text/css">
+
+    body {
+      background: #ffffff;
+      color: #333333;
+    }
+
+    .content-section {
+      background: #ffffff;
+      padding: 10px 20px;
+      border: 1px solid #aaaaaa;
+      border-radius: 3px;
+      margin-bottom: 20px;
+    }
+
+    .profile-img {
+      height: 125px;
+      width: 125px;
+      margin-right: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      border: 1px solid #aaaaaa;
+    }
+
+    .btn-del :hover {
+        color: #cc2565;
+    }
+
+    .btn-edit :hover {
+        color: #6445ff;
+    }
+
+    .my-btn {
+        color: #4f4f49;
+    }
+
+    .article-title {
+      color: #444444;
+    }
+
+    a.article-title:hover {
+      color: #428bca;
+      text-decoration: none;
+    }
+
+    .article-content {
+      white-space: pre-line;
+    }
+
+    .crop {
+        white-space: nowrap;
+        max-width: 600px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .article-img {
+      height: 65px;
+      width: 65px;
+      margin-right: 16px;
+    }
+
+    .article-metadata {
+      padding-bottom: 1px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #e3e3e3
+    }
+
+    .article-metadata a:hover {
+      color: #333;
+      text-decoration: none;
+    }
+
+    .article-svg {
+      width: 25px;
+      height: 25px;
+      vertical-align: middle;
+    }
+
+
+
+    </style>
 </head>
 <body>
-    <header class="site-header">
+<header class="site-header">
 
-        <!-- Site Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="{{ url_for('main.home') }}">Academic Manager </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
-                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <div class="navbar-nav mr-auto">
-                    <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
-                    <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">About</a>
-                </div>
-
-                <!-- Site Navbar | Right Side -->
-                <div class="navbar-nav">
-                    {% if current_user.is_authenticated %}
-                        <a class="nav-link" href="{{ url_for('main.profile') }}">Profile</a>
-                        <a class="nav-link" href="{{ url_for('main.logout') }}">Log Out</a>
-                    {% else %}
-                        <a class="nav-link" href="{{ url_for('main.login') }}">Login</a>
-                        <a class="nav-link" href="{{ url_for('main.register') }}">Register</a>
-                    {% endif %}
-                </div>
+    <!-- Site Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="{{ url_for('main.home') }}"><i class="fas fa-user-graduate mr-2 ml-1"></i>Academic
+            Manager </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <div class="navbar-nav mr-auto">
+                <a class="nav-link" href="{{ url_for('main.home') }}"><i class="fas fa-home mr-2"></i>Home</a>
+                <a class="nav-link" href="{{ url_for('admin.admin_panel') }}"><i class="fas fa-info-circle mr-2"></i>About</a>
             </div>
-        </nav>
 
-        {% if current_user.is_authenticated %}
-            <nav class="navbar navbar-expand-md navbar-light bg-light">
-
-                <!-- Admin Navbar -->
-                {% if current_user.is_admin %}
-                    <a class="navbar-brand">Admin</a>
-                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                      <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">Panel</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.admin_students') }}">Students</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.admin_teachers') }}">Teachers</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.admin_courses') }}">Courses</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('courses.add_course') }}">Add Course</a>
-                      </li>
-                    </ul>
-                    <!-- Admin Search -->
-                    <form action="{{ url_for('admin.admin_search_panel') }}" method="post" class="form-inline">
-                        <input class="form-control mr-sm-2" name="search" type="search"
-                               placeholder="Search by User Name" aria-label="Search" required>
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" >Search</button>
-                    </form>
-
-                <!-- Teacher Navbar -->
-
-                {% elif current_user.is_teacher %}
-                    <a class="navbar-brand">Teacher</a>
-                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                      <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('teachers.manage_courses_teacher') }}">Manage Courses</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('courses.add_course') }}">Add Course</a>
-                      </li>
-                    </ul>
-
-                <!-- Student Navbar -->
-                {% elif current_user.is_student %}
-                    <a class="navbar-brand">Student</a>
-                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                      <li class="nav-item active">
-                        <a class="nav-link" href="{{ url_for('students.manage_courses_student') }}">Manage Courses</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('students.new_enrollment') }}">New Enrollment</a>
-                      </li>
-                    </ul>
+            <!-- Site Navbar | Right Side -->
+            <div class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                <a class="nav-link" href="{{ url_for('main.profile', user_id=current_user.id) }}">
+                    <i class="fas fa-user-circle"></i> Profile</a>
+                <a class="nav-link" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt mr-2"></i>Log Out</a>
+                {% else %}
+                <a class="nav-link" href="{{ url_for('main.login') }}"><i class="fas fa-sign-in-alt mr-2"></i>Login</a>
+                <a class="nav-link" href="{{ url_for('main.register') }}"><i class="fas fa-user-plus mr-2"></i>Register</a>
                 {% endif %}
-            </nav>
-        {% endif %}
-
-    </header>
-
-
-    <main role="main" class="container">
-            <div class="col-md-13 mt-4 mb-3">
-                {% block content %}{% endblock %}
             </div>
+        </div>
+    </nav>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                    {% for category, msg in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            <strong>info: </strong>{{msg}}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span></button>
-                        </div>
-                    {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </main>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-            crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-            crossorigin="anonymous"></script>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+
+        <!-- Admin Navbar -->
+        {% if current_user.is_admin %}
+        <a class="navbar-brand">Admin</a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">Panel</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('admin.admin_students') }}">Students</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('admin.admin_teachers') }}">Teachers</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('admin.admin_courses') }}">Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('courses.add_course') }}">Add Course</a>
+            </li>
+        </ul>
+        <!-- Admin Search -->
+        <form action="{{ url_for('admin.admin_search_panel') }}" method="post" class="form-inline">
+            <input class="form-control mr-sm-2" name="search" type="search"
+                   placeholder="Search by User Name" aria-label="Search" required>
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        <!-- Teacher Navbar -->
+
+        {% elif current_user.is_teacher %}
+        <a class="navbar-brand">Teacher</a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('teachers.manage_courses_teacher') }}">Manage Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('courses.add_course') }}">Add Course</a>
+            </li>
+        </ul>
+
+        <!-- Student Navbar -->
+        {% elif current_user.is_student %}
+        <a class="navbar-brand">Student</a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('students.manage_courses_student') }}">Manage Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('students.new_enrollment') }}">New Enrollment</a>
+            </li>
+        </ul>
+        {% endif %}
+    </nav>
+    {% endif %}
+
+</header>
+
+<main role="main" class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, msg in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+        <strong>info: </strong>{{msg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="col-md-13 mt-4 mb-3">
+        {% block content %}{% endblock %}
+    </div>
+
+
+</main>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
+      integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
+      crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<!--script src="//cdn.ckeditor.com/4.15.0/basic/ckeditor.js"></script>
+<script type="text/javascript">
+    CKEDITOR.replace('editor')
+</script-->
 </body>
 </html>

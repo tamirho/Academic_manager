@@ -1,88 +1,87 @@
 {% extends "base.html" %}
 {% block title %}Watch {{ teacher.user_name }}{% endblock %}
 {% block content %}
-<h4 class="card-header">{{ teacher.user_name }} Profile</h4>
-<div class="card-body">
-    <h5>Details:</h5>
-    <table class="table" style="width:100%">
-        <thead>
-        <tr>
-            <th>User Name</th>
-            <th>Email</th>
-            {% if "type" in session %}
-                {% if session["type"] == "admin" %}
-                <th>Approval</th>
-                <th></th>
-                <th>Action</th>
-                {% endif %}
-            {% endif %}
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>{{ teacher.user_name }}</td>
-            <td>{{ teacher.email }}</td>
-            {% if "type" in session %}
-                {% if session["type"] == "admin" %}
-                <td>
-                    {{ teacher.approved }}
-                </td>
-                <td>
-                    {% if teacher.approved %}
-                        <a href="{{ url_for('admin.teacher_approval', teacher_id=teacher.id, action='disapprove') }}"
-                           class="badge badge-warning">Disapprove {{ teacher.user_name }}</a>
-                    {% else %}
-                        <a href="{{ url_for('admin.teacher_approval' ,teacher_id=teacher.id, action='approve') }}"
-                           class="badge badge-info">Approve {{ teacher.user_name }}</a>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ url_for('teachers.update_teacher', teacher_id=teacher.id) }}"
-                       class="badge badge-success">Update</a>
-                    <a href="{{ url_for('teachers.delete_teacher', teacher_id=teacher.id) }}"
-                       class="badge badge-danger">Delete</a>
-                </td>
-                {% endif %}
-            {% endif %}
-        </tr>
-        </tbody>
-    </table>
-    <br><br>
-    <div>
-        <h5>Courses:</h5>
-        <table class="table" style="width:100%">
-            <thead>
-            <tr>
-                <th>Course Name</th>
-                <th>Participants</th>
-                {% if "type" in session %}
-                {% if session["type"] == "admin" %}
-                <th>Action</th>
-                {% endif %}
+<div class="card">
+    <h4 class="card-header">Profile</h4>
+    <div class="card-body">
+        <div class="media">
+            <img class="rounded-circle profile-img" src="{{ image_file }}" alt="profile picture">
+            <div class="media-body">
+                <h2 class="account-heading">{{ teacher.full_name }}</h2>
+                <p class="text-secondary">{{ teacher.email }}
+                    <br>{{ teacher.gender }}, {{ teacher.role }}
+                    <br>Last Seen at {{ teacher.last_seen.strftime('%H:%M %b %d, %Y') }}</p>
+
+                {% if current_user.is_admin %}
+                <a href="#"
+                   class="btn btn-dark btn-sm"><i class="fas fa-key mr-2"></i>Change Password</a>
+                <a href="{{ url_for('main.update_user_profile', user_id=teacher.id) }}"
+                   class="btn btn-success btn-sm"><i class="fas fa-pencil-alt mr-2"></i>Update</a>
+
+                <!-- Button trigger modal -->
+                <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">
+                    <i class="fas fa-trash-alt mr-2"></i>Delete</button>
                 {% endif %}
 
-            </tr>
-            </thead>
-            <tbody>
-            {% for course in teacher.course %}
-            <tr>
-                <td>{{ course.course_name }}</td>
-                <td></td>
-                {% if "type" in session %}
-                {% if session["type"] == "admin" %}
-                <th>
-                    <a href="{{ url_for('courses.course_dashboard_teacher', course_id=course.id) }}"
-                       class="badge badge-info">Dashboard</a>
-                    <a href="{{ url_for('courses.delete_course', course_id=course.id) }}"
-                       class="badge badge-danger">Delete</a>
-                </th>
-                {% endif %}
-                {% endif %}
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+            </div>
+        </div>
     </div>
+</div>
+<br>
+<div class="card">
+    <h4 class="card-header">Courses</h4>
+    <div class="card-body">
+        <div>
+            <table class="table" style="width:100%">
+                <thead>
+                <tr>
+                    <th colspan="col">#</th>
+                    <th colspan="col">Course Name</th>
+                    <th colspan="col">Participants</th>
+                    <th colspan="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for course in teacher.course %}
+                <tr>
+                    <td colspan="row">{{ loop.index }}</td>
+                    <td colspan="row">{{ course.course_name }}</td>
+                    <td colspan="row">{{ course.enrollment | length }}</td>
+                    <td colspan="row">
+                        <a href="{{ url_for('courses.course_dashboard', course_id=course.id) }}"
+                           class="badge badge-info">Dashboard</a>
+                        <a href="{{ url_for('courses.delete_course', course_id=course.id) }}"
+                           class="badge badge-danger">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Teacher</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete {{ teacher.email }} ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a type="button" class="btn btn-danger"
+                href="{{ url_for('main.delete_user', user_id=teacher.id) }}">Delete</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

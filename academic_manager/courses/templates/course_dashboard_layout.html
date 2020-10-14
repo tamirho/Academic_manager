@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_name }}{% endblock %}
+{% block content %}
+
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="content-section">
+            <h4>{{ course.course_name }}</h4>
+            <p class='text-muted'>Dashboard</p>
+
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">
+                    <a href="{{ url_for('courses.course_dashboard', course_id=course.id) }}">
+                        <i class="fas fa-chart-line fa-lg mr-2"></i>Main</a>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <a href="{{ url_for('courses.dashboard_participants', course_id=course.id) }}">
+                        <i class="fas fa-users fa-lg mr-2"></i>Participants</a>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <a href="{{ url_for('courses.dashboard_view_tasks', course_id=course.id) }}">
+                        <i class="fas fa-tasks fa-lg mr-2"></i>Tasks</a>
+                </li>
+                {% if current_user.is_admin or current_user.is_teacher %}
+                <li class="list-group-item list-group-item-light">
+                    <a href="{{ url_for('courses.dashboard_add_tasks', course_id=course.id) }}">
+                        <i class="fas fa-pencil-alt fa-lg mr-2"></i>New Task</a>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <a href="{{ url_for('courses.dashboard_update_grades', course_id=course.id) }}">
+                        <i class="fas fa-award fa-lg mr-2"></i>Grades</a>
+                </li>
+                {% endif %}
+                <li class="list-group-item list-group-item-light">
+                    <a href="#">
+                        <i class="far fa-calendar fa-lg mr-2"></i> Calendar</a>
+                </li>
+            </ul>
+            </p>
+        </div>
+    </div>
+    <div class="col-md-8">
+        {% block dashboard %}{% endblock %}
+    </div>
+</div>
+
+
+{% endblock content %}

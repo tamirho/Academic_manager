@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_name }} - Dashboard{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5 style="text-align:center;">{{ course.course_name }} - Dashboard</h5>
+        <hr>
+        <ul class="nav nav-pills nav-justified" id="pills-tab" role="tablist">
+
+          <!-- Home -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
+               aria-controls="pills-home" aria-selected="true">Home</a>
+          </li>
+
+          <!-- Participants -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="pills-participants-tab" data-toggle="pill" href="#pills-participants" role="tab"
+               aria-controls="pills-participants" aria-selected="false">Participants</a>
+          </li>
+
+          <!-- View tasks  -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="pills-tasks-tab" data-toggle="pill" href="#pills-tasks" role="tab"
+               aria-controls="pills-tasks" aria-selected="false">View tasks</a>
+          </li>
+
+          <!-- Add task  -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="pills-add_task-tab" data-toggle="pill" href="#pills-add_task" role="tab"
+               aria-controls="pills-add_task" aria-selected="false">Add new task</a>
+          </li>
+
+          <!-- Grades  -->
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="pills-grades-tab" data-toggle="pill" href="#pills-grades" role="tab"
+               aria-controls="pills-grades" aria-selected="false">Grades</a>
+          </li>
+
+        </ul>
+    </div>
+
+    <div class="card-body">
+        <br>
+        <div class="tab-content" id="pills-tabContent">
+
+          <!-- Home -->
+          <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+              <p>Teacher: {{ course.lecturer.full_name }}</p>
+              <p>In this course you have {{ course.enrollment|length }} participants.</p><br><br>
+              {% if best_student %}
+                <strong>Outstanding student</strong>
+                <p>Name: {{ best_student.full_name }} |  Avg: {{ '%0.2f' % best_student.avg()|float }}</p>
+              {% endif %}
+          </div>
+
+          <!-- Participants -->
+          <div class="tab-pane fade" id="pills-participants" role="tabpanel" aria-labelledby="pills-participants-tab">
+
+              <table  class="table" style="width:100%">
+              <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Grade</th>
+                    <th scope="col">Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for enroll in course.enrollment %}
+                      <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ enroll.student.full_name }}</td>
+                        <td>{{ enroll.student.email }}</td>
+                        <td>{{ enroll.grade if enroll.grade }}</td>
+                        <td><a href="{{ url_for('students.watch_student', user_id=enroll.student.id) }}"
+                               class="badge badge-primary">Watch</a>
+                            <a href="{{ url_for('students.remove_enrollment', user_id=enroll.student.id,
+                             enrollment_id=enroll.id) }}"
+                               class="badge badge-danger">Remove Enrollment</a>
+                        </td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- View tasks  -->
+          <div class="tab-pane fade" id="pills-tasks" role="tabpanel" aria-labelledby="pills-tasks-tab">
+            {% for task in tasks %}
+                <div class="jumbotron">
+                    <h1 class="display-4">{{ task.title }}</h1>
+                    <p class="lead">Posted by {{ course.lecturer.full_name }}
+                        at {{ task.date_posted.strftime('%H:%M %b %d, %Y') }}
+                        {% if task.update_time %}
+                            <br>Last update at {{ task.update_time.strftime('%H:%M %b %d, %Y') }}
+                        {% endif %}
+                    </p>
+                    <hr class="my-4">
+                    <p>{{ task.content }} </p>
+
+
+                    <a href="{{ url_for('courses.update_task', task_id=task.id) }}" class="badge badge-dark">Update</a>
+                    <a href="{{ url_for('courses.delete_task', task_id=task.id) }}" class="badge badge-danger">Delete</a>
+                </div>
+            {% endfor %}
+          </div>
+
+          <!-- Add task  -->
+          <div class="tab-pane fade" id="pills-add_task" role="tabpanel" aria-labelledby="pills-add_task-tab">
+            <form action="{{ url_for('courses.add_task', course_id=course.id) }}" method="post">
+                <div class="form-group">
+                        <div class="form-group row">
+                            <label for="course" class="col-sm-2">Course</label>
+                            <div class="col-sm-2">
+                               <input type="text" readonly min="0" max="100" class="form-control-plaintext" id="course"
+                                      value="{{ course.course_name }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputTitle" class="col-sm-2 col-form-label">
+                                Title:</label>
+                            <div class="col-sm-8">
+                               <input type="text" name="title" class="form-control" id="inputTitle"
+                               placeholder="Task Title" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputContent" class="col-sm-2 col-form-label">
+                                Content:</label>
+                            <div class="col-sm-8">
+                                <textarea  type="text" name="content" class="form-control"
+                                           style=" height: 200px; white-space: nowrap;"
+                                           placeholder="Enter your Task" id="inputContent"
+                                           required></textarea>
+                            </div>
+                        </div>
+                </div>
+                <br>
+                <button type="submit" value="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+
+          <!-- Grades  -->
+          <div class="tab-pane fade" id="pills-grades" role="tabpanel" aria-labelledby="pills-grades-tab">
+              <form action="{{ url_for('courses.update_grades', course_id=course.id) }}" method="post">
+                <div class="form-group">
+                    <h5>{{ course.enrollment|length }} Participants: </h5><br>
+                    {% for enroll in course.enrollment %}
+                        <div class="form-group row">
+                            <label for="inputGrade{{ enroll.student.id }}" class="col-sm-3 col-form-label">
+                                {{ loop.index }}. {{ enroll.student.full_name }}</label>
+                            <div class="col-sm-2">
+                               <input type="number" name="{{ enroll.student.full_name }}" min="0" max="100"
+                                      class="form-control" id="inputGrade{{ enroll.student.id }}"
+                                      value="{{ enroll.grade }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div><br>
+                <button type="submit" value="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

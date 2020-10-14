@@ -2,62 +2,89 @@
 {% block title %}Watch {{ student.full_name }}{% endblock %}
 {% block content %}
 <div class="card">
-    <h4 class="card-header">{{ student.full_name }} Profile</h4>
+    <h4 class="card-header">Profile</h4>
     <div class="card-body">
-        <h5>Details:</h5>
-        <table class="table" style="width:100%">
-            <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>{{ student.full_name }}</td>
-                <td>{{ student.email }}</td>
-                        <td>
-                            <a href="#"
-                               class="badge badge-success">Update</a>
-                            <a href="{{ url_for('main.delete_user', user_id=student.id) }}"
-                               class="badge badge-danger">Delete</a>
-                        </td>
-            </tr>
-            </tbody>
-        </table>
-        <br><br>
-        <div>
-            <h5>Courses:</h5>
-            <table class="table" style="width:100%">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Course Name</th>
-                    <th>Grade</th>
-                    <th>Lecturer</th>
-                    <th>Action</th>
+            <div class="media">
+                <img class="rounded-circle profile-img" src="{{ image_file }}" alt="profile picture">
+                <div class="media-body">
+                    <h2 class="account-heading">{{ student.full_name }}</h2>
+                    <p class="text-secondary">{{ student.email }}
+                        <br>{{ student.gender }}, {{ student.role }}
+                        <br>Last Seen at {{ student.last_seen.strftime('%H:%M %b %d, %Y') }}</p>
 
+                    {% if current_user.is_admin %}
+                    <a href="#"
+                       class="btn btn-dark btn-sm"><i class="fas fa-key mr-2"></i>Change Password</a>
+                    <a href="{{ url_for('main.update_user_profile', user_id=student.id) }}"
+                       class="btn btn-success btn-sm"><i class="fas fa-pencil-alt mr-2"></i>Update</a>
 
-                </tr>
-                </thead>
-                <tbody>
-                {% for enrollment in student.enrollment %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ enrollment.course.course_name }}</td>
-                    <td>{{ enrollment.grade }}</td>
-                    <td>{{ enrollment.course.lecturer.full_name }}</td>
-                    <th><a href="#" class="badge badge-info">Watch Progress</a>
-                        <a href="{{ url_for('students.remove_enrollment', user_id=student.id,
-                                enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
+                    <!-- Button trigger modal -->
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">
+                        <i class="fas fa-trash-alt mr-2"></i>Delete</button>
+                    {% endif %}
 
-                    </th>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                </div>
         </div>
     </div>
 </div>
+<br>
+<div class="card">
+    <h4 class="card-header">Courses</h4>
+    <div class="card-body">
+        <br>
+        <table class="table" style="width:100%">
+            <thead>
+            <tr>
+                <th colspan="col">#</th>
+                <th colspan="col">Course Name</th>
+                <th colspan="col">Grade</th>
+                <th colspan="col">Lecturer</th>
+                <th colspan="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for enrollment in student.enrollment %}
+            <tr>
+                <td colspan="row">{{ loop.index }}</td>
+                <td colspan="row">{{ enrollment.course.course_name }}</td>
+                <td colspan="row">{{ enrollment.grade }}</td>
+                <td colspan="row">{{ enrollment.course.lecturer.full_name }}</td>
+                {% if current_user.is_admin or current_user == enrollment.course.lecturer %}
+                <td colspan="row"><a href="#" class="badge badge-info">Watch Progress</a>
+                    <a href="{{ url_for('students.remove_enrollment', user_id=student.id,
+                                enrollment_id=enrollment.id) }}" class="badge badge-danger">Remove</a>
+                </td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Student</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete {{ student.email }} ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a type="button" class="btn btn-danger"
+                href="{{ url_for('main.delete_user', user_id=student.id) }}">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

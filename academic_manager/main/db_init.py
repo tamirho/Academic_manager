@@ -184,13 +184,36 @@ def enrollment_init():
 
 
 def task_init():
+    long_text = """In project management, a task is an activity that needs to be accomplished within 
+        a defined period of time or by a deadline to work towards work-related goals. It is a small essential piece of
+         a job that serves as a means to differentiate various components of a project. A task can be broken down into 
+         assignments which should also have a defined start and end date or a deadline for completion. One or more 
+         assignments on a task puts the task under execution. Completion of all assignments on a specific task normally
+          renders the task completed. Tasks can be linked together to create dependencies.
+
+        Tasks completion generally requires the coordination of others. Coordinated human interaction takes on the role
+        of combining the integration of time, energy, effort, ability, and resources of multiple individuals to meet
+         a common goal. Coordination can also be thought of as the critical mechanism that links or ties together the
+          efforts on the singular level to that of the larger task being completed by multiple members. Coordination
+           allows for the successful completion of the otherwise larger tasks that one might encounter.
+
+            In most projects, tasks may suffer one of two major drawbacks:
+
+            Task dependency: Which is normal as most tasks rely on others to get done. However, this can lead to the 
+            stagnation of a project when many tasks cannot get started unless others are finished.
+            Unclear understanding of the term complete: For example, if a task is 90% complete, does this mean that 
+            it will take only 1/9 of the time already spent on this task to finish it? Although this is mathematically
+             sound, it is rarely the case when it comes to practice."""
+
     courses = Course.query.all()
     for course in courses:
-        task1 = Task('Task 1', 'hello students this is my first task', course.id)
-        task2 = Task('Homework', 'homework task: do questions 1,2,3,4,5,6 from the notebook', course.id)
-        task3 = Task('Task 2', 'hello students this is my seconed task', course.id)
-        task4 = Task('Homework', 'homework task: do questions 7,8,9 from the notebook', course.id)
+        task = Task('Long Task', long_text, course.id, course.lecturer.id)
+        task1 = Task('Task 1', 'hello students this is my first task', course.id, course.lecturer.id)
+        task2 = Task('Homework', 'homework task: do questions 1,2,3,4,5,6 from the notebook', course.id, course.lecturer.id)
+        task3 = Task('Task 2', 'hello students this is my seconed task', course.id, course.lecturer.id)
+        task4 = Task('Homework', 'homework task: do questions 7,8,9 from the notebook', course.id, course.lecturer.id)
         db.session.add(task1)
+        db.session.add(task)
         db.session.add(task2)
         db.session.add(task3)
         db.session.add(task4)

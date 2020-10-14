@@ -1,8 +1,7 @@
-from flask import redirect, url_for, render_template, request, session, flash, Blueprint
+from flask import redirect, render_template, request, session, flash, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
-from academic_manager.extensions import db, bcrypt, restricted
-from academic_manager.models import User
-from academic_manager.forms import RegistrationForm, LoginForm, UpdateUserForm
+from academic_manager.extensions import bcrypt, restricted
+from academic_manager.main.forms import RegistrationForm, LoginForm, UpdateUserForm
 from academic_manager.main.utilities import *
 from academic_manager.students.utilities import *
 from datetime import datetime
@@ -11,10 +10,15 @@ from academic_manager.main.db_init import init_db
 main = Blueprint('main', __name__, template_folder="templates")
 
 
+@main.route("/init_db")
+def main_db_init():
+    init_db()
+    return redirect(url_for("main.home"))
+
+
 @main.route("/")
 @main.route("/home/")
 def home():
-    # init_db()
     best_student = get_best_student()
     current_date = datetime.now()
     return render_template("home.html", best_student=best_student, current_date=current_date)
@@ -76,13 +80,15 @@ def logout():
     return redirect(url_for("main.home"))
 
 
-@main.route("/profile/")
+@main.route("/profile/<int:user_id>")
 @login_required
-def profile():
-    image_file = url_for('static', filename='profile_pics/' + current_user.profile_img)
-    return render_template('profile.html', image_file=image_file)
+def profile(user_id):
+    user = User.query.get_or_404(user_id)
+    image_file = url_for('static', filename='profile_pics/' + user.profile_img)
+    return render_template('profile.html', user=user, image_file=image_file)
 
 
+# todo fix the problem when admin update other users
 @main.route("/update/<int:user_id>/", methods=['POST', 'GET'])
 @restricted(role=["admin", "current_user"])
 def update_user_profile(user_id):
@@ -108,7 +114,7 @@ def update_user_profile(user_id):
         db.session.commit()
 
         flash(f"{name}'s profile has been updated!", 'success')
-        return redirect(url_for('main.profile'))
+        return redirect(url_for('main.profile', user_id=user_id))
 
     elif request.method == 'GET':
         form.first_name.data = user.first_name
@@ -144,5 +150,7 @@ def delete_user(user_id):
     # Admin deleting other user profile
     if current_user.is_admin:
         flash(f"{user_to_del.email} has been deleted", "success")
+        is_teacher = user_to_del.is_teacher
         user_to_del.delete_from_db()
-        return redirect(request.referrer)
+        return redirect(url_for("admin.admin_teachers")) if is_teacher \
+            else redirect(url_for("admin.admin_students"))

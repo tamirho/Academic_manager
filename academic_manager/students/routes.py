@@ -1,9 +1,7 @@
-from flask import redirect, url_for, render_template, request, session, flash, Blueprint, abort
-from flask_login import current_user, login_required
-from academic_manager.extensions import db, restricted
-from academic_manager.forms import NewEnrollmentForm
-from academic_manager.models import Student, Enrollment, Course
-from academic_manager.main.utilities import *
+from flask import redirect, url_for, render_template, request, flash, Blueprint, abort
+from flask_login import current_user
+from academic_manager.extensions import restricted
+from academic_manager.students.forms import NewEnrollmentForm
 from academic_manager.students.utilities import *
 
 students = Blueprint('students', __name__, template_folder="templates", url_prefix="/students")
@@ -64,5 +62,6 @@ def remove_enrollment(user_id, enrollment_id):
 @restricted(role=["admin", "teacher"])
 def watch_student(user_id):
     student_profile = Student.query.filter_by(id=user_id).first_or_404()
-    return render_template("watch_student.html", student=student_profile)
+    image_file = url_for('static', filename='profile_pics/' + student_profile.profile_img)
+    return render_template("watch_student.html", student=student_profile, image_file=image_file)
 
