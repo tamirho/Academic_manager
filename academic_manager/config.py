@@ -2,8 +2,6 @@ import os
 
 
 class Config:
-    # SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
-    # SECRET_KEY = 'd5ccb92e5a2833d6cb724faa020cc876'
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -15,5 +13,4 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('EMAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
-    # MAIL_USERNAME = 'noreply.tamir@gmail.com'
-    # MAIL_PASSWORD = 'noreply123'
+
