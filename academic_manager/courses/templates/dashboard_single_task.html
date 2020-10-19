@@ -1,0 +1,77 @@
+{% extends "course_dashboard_layout.html" %}
+{% block dashboard %}
+
+<article class="media content-section">
+    <img class="rounded-circle article-img"
+         src="{{ url_for('static', filename='profile_pics/' + task.author.profile_img) }}">
+    <div class="media-body">
+
+        <div class="article-metadata">
+            <a class="mr-2"
+               href="{{ url_for('teachers.watch_teacher', user_id=task.author.id) if current_user.is_admin
+               else url_for('main.profile', user_id=task.author.id)}}">{{ task.author.full_name }}</a>
+            <small class="text-muted">{{ task.date_posted.strftime('%H:%M %b %d, %Y') }}</small>
+
+            {% if current_user.is_admin or current_user.is_teacher %}
+            <div style="float: right;">
+                <a class="my-btn btn-edit"
+                   href="{{ url_for('courses.dashboard_edit_task', course_id=course.id, task_id=task.id) }}">
+                    <i class="fas fa-edit"></i></a>
+
+                <!-- Button trigger modal -->
+                <a class="my-btn btn-del" data-toggle="modal" data-target="#deleteTaskModal">
+                    <i class="fas fa-trash-alt"></i></a>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <h2><a class="article-title" href="#">{{ task.title }}</a></h2>
+        <p class="article-content">{{ task.content }}</p>
+
+        {% for file in task.files %}
+            <a href="{{ url_for('static', filename='uploads/' + file.path) }}">
+                <i class="far fa-file-alt mr-2"></i>{{ file.name }}</a>
+
+            {%- if current_user.is_admin or current_user.is_teacher -%}
+                <!-- Button trigger modal -->
+                <a class="my-btn btn-del" href="{{ url_for('courses.remove_file', course_id=course.id, file_id=file.id) }}">
+                    <i class="far fa-times-circle ml-4 mr-1"></i></a>
+            {%- endif -%}
+            <br>
+        {% endfor %}
+        <br>
+        {% if task.update_time %}
+        <small class="text-muted">Another edit was made at {{ task.update_time.strftime('%H:%M %b %d, %Y') }}
+            {% endif %}
+        </small>
+
+
+    </div>
+</article>
+
+
+<!-- Task Modal -->
+<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTaskModalLabel">Delete Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this task?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a type="button" class="btn btn-danger"
+                   href="{{ url_for('courses.dashboard_delete_task', task_id=task.id) }}">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock dashboard %}

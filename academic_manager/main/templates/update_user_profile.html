@@ -1,26 +1,93 @@
 {% extends "base.html" %}
-    {% block title %}Update {{ user.user_name }} Profile{% endblock %}
+    {% block title %}Update {{ user.user_name }}'s Profile{% endblock %}
 {% block content %}
-    <h4 class="card-header">Update Profile</h4>
+<div class="card">
+    <h5 class="card-header">Update {{ user.full_name }}'s Profile</h5>
     <div class="card-body">
-        <h5>User Details:</h5>
 
-        <form action="#" method="post">
-            <div class="form-group">
-                <label>User Name</label>
-                <input type="text"  name="user_name" class="form-control" id="formGroupName"
-                       value="{{ user.user_name }}">
-            </div>
-            <div class="form-group">
-                <label>E-mail</label>
-                <input type="email"  name="user_email" class="form-control" id="formGroupEmail"
-                       value="{{ user.email }}">
-            </div>
-            <br>
-            <button type="submit" value="submit" class="btn btn-primary">Update</button>
+        <form action="#" method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
 
+            <fieldset class="form-group">
+
+                <div class="row">
+
+                    <!-- First Name -->
+                    <div class="form-group col">
+                        {{ form.first_name.label(class="form-control-label") }}
+                        {% if form.first_name.errors %}
+                            {{ form.first_name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.first_name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.first_name(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="form-group col">
+                        {{ form.last_name.label(class="form-control-label") }}
+                        {% if form.last_name.errors %}
+                            {{ form.last_name(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.last_name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.last_name(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control") }}
+                        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    {% endif %}
+                </div>
+
+                <!-- Picture -->
+                <div class="form-group">
+                    {{ form.picture.label() }}:
+                    {{ form.picture(class="form-control-file  form-control-sm") }}
+                    {% if form.picture.errors %}
+                            {% for error in form.picture.errors %}
+                                <span class="text-danger">{{ error }}</span><br>
+                            {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                    <div>{{ form.gender.label(class="form-control-label") }}:</div>
+                    {% for subfield in form.gender %}
+                        <div class="form-check form-check-inline">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </fieldset>
+
+            <!-- Submit -->
+            <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+            </div>
         </form>
     </div>
-
-
+</div>
 {% endblock %}

@@ -1,0 +1,68 @@
+{% extends "course_dashboard_layout.html" %}
+{% block dashboard %}
+
+<h2 class="mb-4"><i class="fas fa-pencil-alt mr-2"></i>{{ page_name }}</h2>
+
+<div class="content-section">
+            <form action="#" method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <!-- Title -->
+                <div class="form-group">
+                    {{ form.title.label(class="form-control-label") }}
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <!-- Content -->
+                <div class="form-group">
+                    {{ form.content.label(class="form-control-label") }}
+                    {{ form.content(class="form-control", id="editor", rows="8", cols="50") }}
+                </div>
+
+                <!-- File -->
+                <div class="form-group">
+                    {{ form.file.label() }}:
+                    {{ form.file(class="form-control-file  form-control-sm") }}
+                    {% if form.file.errors %}
+                            {% for error in form.file.errors %}
+                                <span class="text-danger">{{ error }}</span></br>
+                            {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- File Name -->
+                <div class="form-group">
+                    {{ form.file_name.label(class="form-control-label") }}
+                    {% if form.file_name.errors %}
+                        {{ form.file_name(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.file_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.file_name(class="form-control") }}
+                        <small class="form-text text-muted">Note: The file name must be in English.<br>
+                        If the file you uploaded is not in English please write a new name.</small>
+                    {% endif %}
+                </div>
+
+            </fieldset>
+
+            <!-- Submit -->
+            <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+</div>
+
+{% endblock dashboard %}

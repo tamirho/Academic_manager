@@ -1,0 +1,78 @@
+{% extends "course_dashboard_layout.html" %}
+{% block dashboard %}
+
+
+<h2 class="mb-4"><i class="fas fa-award mr-2"></i>Grades</h2>
+
+
+<form action="#" method="post">
+        <div>
+
+        <small class='text-muted'>{{ course.enrollment|length }} Participants:</small>
+        <!-- Submit -->
+        <button type="submit" value="Submit" class="btn btn-outline-info btn-sm mb-2" style="float: right;">Submit</button>
+
+    </div>
+    <table class="table" style="width: 100%;">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Grade</th>
+            <th scope="col">Update</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for enroll in course.enrollment %}
+        {% set student = enroll.student %}
+        <tr>
+            <td scope="row">{{ loop.index }}</td>
+            <td scope="row">
+                <a href="{{ url_for('students.watch_student', user_id=student.id)
+                                if current_user.is_admin or current_user.is_teacher
+                                else url_for('main.profile', user_id=student.id)}}">
+                    {{ student.full_name }}</a>
+            </td>
+            <td scope="row">{{ enroll.grade if enroll.grade else "-" }}</td>
+            <td scope="row">
+                <input type="number" name="{{ enroll.id }}" min="0" max="100"
+                       class="form-control" value="{{ enroll.grade }}">
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <!-- Submit -->
+    <div class="form-group">
+        <button type="submit" value="Submit" class="btn btn-outline-info">Submit</button>
+    </div>
+</form>
+
+{% endblock dashboard %}
+
+
+<!--
+
+
+    {% for enroll in course.enrollment %}
+    {% set student = enroll.student %}
+    <tr>
+        <td scope="row">{{ loop.index }}</td>
+        <td scope="row">
+            <a href="{{ url_for('students.watch_student', user_id=student.id)
+                                if current_user.is_admin or current_user.is_teacher
+                                else url_for('main.profile', user_id=student.id)}}">
+                {{ student.full_name }}</a>
+        </td>
+        <td scope="row">{{ enroll.grade if enroll.grade else "-" }}</td>
+        <td scope="row">
+            {{ form.content(class="form-control") }}
+        </td>
+    </tr>
+    {% endfor %}
+
+
+
+
+-->

@@ -1,0 +1,62 @@
+{% extends "course_dashboard_layout.html" %}
+{% block dashboard %}
+
+
+<h2 class="mb-4"><i class="fas fa-chart-line mr-2"></i>Main Dashboard</h2>
+
+<div class="content-section">
+    <h5>Teacher: {{ course.lecturer.full_name }}</h5>
+    <h6>There are {{ course.enrollment|length }} participants in this course.</h6><br><br>
+
+    {% if best_student %}
+    <strong>Outstanding student</strong>
+    <p>Name: {{ best_student.full_name }} | Avg: {{ '%0.2f' % best_student.avg()|float }}</p>
+    {% endif %}
+</div>
+
+
+<!- Last Task -->
+{% if task %}
+<h5 class="mb-4">Last Task</h5>
+<article class="media content-section">
+    <img class="rounded-circle article-img"
+         src="{{ url_for('static', filename='profile_pics/' + task.author.profile_img) }}">
+    <div class="media-body">
+
+        <div class="article-metadata">
+            <a class="mr-2"
+               href="{{ url_for('teachers.watch_teacher', user_id=task.author.id) if current_user.is_admin
+               else url_for('main.profile', user_id=task.author.id)}}">{{ task.author.full_name }}</a>
+            <small class="text-muted">{{ task.date_posted.strftime('%H:%M %b %d, %Y') }}</small>
+        </div>
+
+        <h2><a class="article-title"
+               href="{{ url_for('courses.dashboard_single_task', course_id=course.id, task_id=task.id) }}">
+            {{ task.title }}</a>
+        </h2>
+
+        <p class="article-content crop">
+            {{ task.content}}
+        </p>
+
+        {% if task.content %}
+            <a href="{{ url_for('courses.dashboard_single_task', course_id=course.id, task_id=task.id) }}">
+            <i class="fas fa-angle-double-right"></i>
+            </a>
+        {% endif %}
+        <br>
+        {% if task.files %}
+            <small class="text-muted"><i class="far fa-file-alt mr-2"></i>Attached Files ({{ task.files|length }})</small>
+        {% endif %}
+        <br>
+        {% if task.update_time %}
+            <small class="text-muted">
+                Another edit was made at {{ task.update_time.strftime('%H:%M %b %d, %Y') }}
+            </small>
+        {% endif %}
+    </div>
+</article>
+{% endif %}
+
+
+{% endblock dashboard %}

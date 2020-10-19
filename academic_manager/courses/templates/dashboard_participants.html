@@ -1,0 +1,63 @@
+{% extends "course_dashboard_layout.html" %}
+{% block dashboard %}
+
+<h2 class="mb-4"><i class="fas fa-users mr-2"></i>Participants ({{ course.enrollment|length }})</h2>
+
+<table class="table" style="width: 100%;">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        {% set teacher = course.lecturer %}
+        <td scope="row" style="vertical-align: middle;"><i class="fas fa-chalkboard-teacher fa-lg"></i></td>
+        <td scope="row" style="vertical-align: middle;">
+            <a href="{{ url_for('teachers.watch_teacher', user_id=teacher.id)
+                         if current_user.is_admin
+                         else url_for('main.profile', user_id=teacher.id)}}">
+                {{ teacher.full_name }}</a>
+        </td>
+        <td scope="row" style="vertical-align: middle;">{{ teacher.email }}</td>
+        <td scope="row" style="vertical-align: middle;">
+            <img class="rounded-circle article-img"
+                 src="{{ url_for('static', filename='profile_pics/' + teacher.profile_img) }}">
+        </td>
+    </tr>
+
+    {% for enroll in course.enrollment %}
+    {% set student = enroll.student %}
+    <tr>
+        <td scope="row" style="vertical-align: middle;">{{ loop.index }}</td>
+        <td scope="row" style="vertical-align: middle;">
+            <a href="{{ url_for('students.watch_student', user_id=student.id)
+                                if current_user.is_admin or current_user.is_teacher
+                                else url_for('main.profile', user_id=student.id)}}">
+                {{ student.full_name }}</a>
+        </td>
+        <td scope="row" style="vertical-align: middle;">{{ student.email }}</td>
+        <td scope="row" style="vertical-align: middle;">
+            <img class="rounded-circle article-img"
+                 src="{{ url_for('static', filename='profile_pics/' + student.profile_img) }}">
+
+            <!-- Delete student enrollment -->
+            {% if current_user.is_admin or current_user == course.lecturer %}
+            <a class="my-btn btn-del"
+               href="{{ url_for('students.remove_enrollment',
+                   user_id=student.id, enrollment_id=enroll.id) }}">
+                <i class="fas fa-user-minus"></i>
+            </a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock dashboard %}

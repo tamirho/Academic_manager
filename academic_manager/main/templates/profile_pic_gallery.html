@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Pic a pic{% endblock %}
+{% block content %}
+
+<h3><i class="fas fa-camera-retro mr-2 fa-lg"></i>Pick a pic</h3>
+<div class="content-section textalign-center">
+    <form action="#" method="POST">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <!-- Images -->
+            <div class="form-group">
+                {% for subfield in form.images %}
+                <div class="form-check form-check-inline">
+                    {{ subfield(class="form-check-input") }}
+                    <img class="rounded-circle view-img mr-4 my-3"
+                         src="{{ url_for('static', filename='profile_pics/default/' + subfield.data) }}">
+
+                </div>
+                {% endfor %}
+            </div>
+        </fieldset>
+
+        <!-- Submit -->
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}

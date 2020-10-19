@@ -1,44 +1,53 @@
-from flask import session
-from academic_manager.main.form_validation import *
-from academic_manager.models import Student, Teacher, Admin, Enrollment, Course, Task
-from academic_manager.extensions import db
+import os
+import secrets
+from PIL import Image
+from flask import current_app, url_for
+from academic_manager.extensions import db, mail
+from academic_manager.models import Student, Teacher, Admin
+from flask_mail import Message
 
 
-def clear_user_info_from_session():
-    session.pop("user_name", None)
-    session.pop("type", None)
-
-
-def update_user_profile(user_to_update, new_user_name, new_email):
-    messages = []
-    if user_to_update.user_name != new_user_name:
-        if validate_user_name(new_user_name):
-            user_to_update.user_name = new_user_name
-            db.session.commit()
-        else:
-            messages.append("User Name already exist")
-
-    if user_to_update.email != new_email:
-        if validate_email(new_email):
-            user_to_update.email = new_email
-            db.session.commit()
-        else:
-            messages.append("Email already exist")
-
-    return messages
-
-
-def change_user_password(user_to_update, old_pass, new_pass, pass_confirmation):
-    messages = []
-
-    if old_pass != user_to_update.password:
-        messages.append("Incorrect old password!")
-    elif not validate_password(new_pass, pass_confirmation):
-        messages.append("The passwords are not equal!")
+def make_new_user(email, first_name, last_name, hashed_password, gender, role):
+    if role == "admin":
+        new_user = Admin(email, first_name, last_name, hashed_password, gender)
+    elif role == "teacher":
+        new_user = Teacher(email, first_name, last_name, hashed_password, gender)
     else:
-        user_to_update.password = new_pass
-        db.session.commit()
+        new_user = Student(email, first_name, last_name, hashed_password, gender)
 
-    return messages
+    db.session.add(new_user)
+    db.session.commit()
 
 
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    pic_name = random_hex + f_ext
+    pic_path = os.path.join(current_app.root_path, 'static/profile_pics/users', pic_name)
+
+    output_size = (200, 200)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(pic_path)
+
+    return 'users/' + pic_name
+
+
+def remove_profile_picture(pic_name):
+    if pic_name.startswith("users/"):
+        pic_path = os.path.join(current_app.root_path, 'static/profile_pics', pic_name)
+        if os.path.isfile(pic_path):
+            os.remove(pic_path)
+
+
+def send_reset_password_email(user):
+    token = user.get_reset_password_token()
+    msg = Message('Password Reset Request',
+                  sender=os.environ.get('EMAIL_USERNAME'),
+                  recipients=[user.email])
+    msg.body=f'''To reset your password, visit the following link:
+{url_for('main.reset_password_token', token=token, _external=True)}
+
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)

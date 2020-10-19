@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ current_user.first_name }}'s Profile{% endblock %}
+{% block content %}
+<div class="card">
+    <h4 class="card-header">My Profile</h4>
+    <div class="card-body">
+        <div class="media">
+            <img class="rounded-circle profile-img" src="{{ image_file }}" alt="profile picture">
+            <div class="media-body">
+                <h2>{{ user.full_name }}</h2>
+                <p class="text-secondary">{{ user.email }}
+                    <br>{{ user.gender }}, {{ user.role }}
+                    <br>Last Seen at {{ user.last_seen.strftime('%H:%M %b %d, %Y') }}</p>
+                {% if current_user==user or current_user.is_admin %}
+                    <a href="{{ url_for('main.update_user_profile', user_id=user.id) }}"
+                       class="btn btn-success btn-sm"><i class="fas fa-pencil-alt mr-2"></i>Update</a>
+
+                    <!-- Button trigger modal -->
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">
+                        <i class="fas fa-trash-alt mr-2"></i>Delete</button>
+
+                <p>
+                    <a href="{{ url_for('main.profile_picture_gallery') }}"><i class="fas fa-camera-retro mr-2 mt-5"></i>You can take a look at our default profile pictures</a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete {{ user.email }}?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a type="button" class="btn btn-danger"
+                href="{{ url_for('main.delete_user', user_id=user.id) }}">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
