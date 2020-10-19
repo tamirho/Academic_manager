@@ -3,8 +3,6 @@
 
 {% block content %}
 
-
-{% if current_user.is_authenticated %}
     <div class="card">
         <h5 class="card-header">Hey, {{ current_user.first_name }}!</h5>
         <div class="card-body">
@@ -41,23 +39,6 @@
         </div>
     {% endif %}
 
-{% else %}
-    <div class="card">
-        <h5 class="card-header">Hey, {{ current_user.first_name if current_user.is_authenticated else "friend" }}!</h5>
 
-        <div class="card-body media">
-            <div class="media-body">
-                <h5 class="mt-4">Welcome To the Academic Manager</h5>
-                <p>Please Login\Sign-up with the Academic's email address.</p>
-                <div class="mt-4">
-                    <a href="{{ url_for('main.login') }}" class="btn btn-info mt-4">Login</a>
-                    <a href="{{ url_for('main.register') }}" class="btn btn-warning mt-4">Register</a>
-                </div>
-            </div>
-            <img src="{{ url_for('static', filename='/images/book.jpg') }}"
-                 class="mr-5" width="250" height="250" alt="graduate-cap">
-        </div>
-    </div>
-{% endif %}
 
 {% endblock %}

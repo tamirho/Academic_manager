@@ -1,10 +1,12 @@
-from flask import redirect, render_template, request, session, flash, Blueprint
+from flask import redirect, render_template, request, flash, Blueprint, url_for, current_app
 from flask_login import login_user, current_user, logout_user, login_required
 from academic_manager.extensions import bcrypt, restricted
-from academic_manager.main.forms import RegistrationForm, LoginForm, UpdateUserForm
+from academic_manager.main.forms import (RegistrationForm, LoginForm, UpdateUserForm, ProfilePictureForm,
+                                         ResetPasswordForm, ResetPasswordRequestForm)
 from academic_manager.main.utilities import *
 from academic_manager.students.utilities import *
 from datetime import datetime
+from academic_manager.models import User
 from academic_manager.main.db_init import init_db
 
 main = Blueprint('main', __name__, template_folder="templates")
@@ -19,9 +21,12 @@ def main_db_init():
 @main.route("/")
 @main.route("/home/")
 def home():
-    best_student = get_best_student()
-    current_date = datetime.now()
-    return render_template("home.html", best_student=best_student, current_date=current_date)
+    if current_user.is_authenticated:
+        best_student = get_best_student()
+        current_date = datetime.now()
+        return render_template("home.html", best_student=best_student, current_date=current_date)
+    else:
+        return render_template("index.html")
 
 
 @main.route("/login/", methods=['POST', 'GET'])
@@ -44,7 +49,6 @@ def login():
 
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-            session.permanent = True  # todo delete if not need session
             flash("Logged in successfully!", "success")
             return redirect(next_page) if next_page else redirect(url_for("main.home"))
 
@@ -92,8 +96,9 @@ def profile(user_id):
 @main.route("/update/<int:user_id>/", methods=['POST', 'GET'])
 @restricted(role=["admin", "current_user"])
 def update_user_profile(user_id):
-    form = UpdateUserForm()
+    form = UpdateUserForm(user_id=user_id)
     user = User.query.get_or_404(user_id)
+
     if form.validate_on_submit():
 
         # Profile picture handling
@@ -109,7 +114,7 @@ def update_user_profile(user_id):
         name = user.first_name
         user.first_name = form.first_name.data
         user.last_name = form.last_name.data
-        user.email = form.email.data
+        user.email = form.email.data.lower()
         user.gender = form.gender.data
         db.session.commit()
 
@@ -125,14 +130,24 @@ def update_user_profile(user_id):
     return render_template('update_user_profile.html', user=user, form=form)
 
 
-# todo create an option to choose one of the pictures from the default folder
-@main.route("/profile_pic_gallery/")
+@main.route("/profile-pic-gallery/", methods=['POST', 'GET'])
 @login_required
-def get_profile_picture_gallery():
-    item_lst = os.listdir(os.path.join(app.root_path, 'static/profile_pics/default'))
-    gallery_lst = [url_for('static', filename='profile_pics/default/' + item) for item in item_lst]
-    print(gallery_lst)
-    return render_template('profile_pic_gallery.html', gallery_lst=gallery_lst)
+def profile_picture_gallery():
+    item_lst = os.listdir(os.path.join(current_app.root_path, 'static/profile_pics/default'))
+    form = ProfilePictureForm()
+
+    if form.validate_on_submit():
+        remove_profile_picture(current_user.profile_img)
+        current_user.profile_img = "default/" + form.images.data
+        db.session.commit()
+
+        flash('Your profile image has been updated!', 'success')
+        return redirect(url_for('main.profile', user_id=current_user.id))
+
+    elif request.method == "GET":
+        form.images.choices = item_lst
+
+    return render_template('profile_pic_gallery.html', form=form)
 
 
 @main.route("/delete_user/<int:user_id>")
@@ -154,3 +169,39 @@ def delete_user(user_id):
         user_to_del.delete_from_db()
         return redirect(url_for("admin.admin_teachers")) if is_teacher \
             else redirect(url_for("admin.admin_students"))
+
+
+@main.route("/reset-password/", methods=['POST', 'GET'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        flash("Already logged in!", "warning")
+        return redirect(url_for("main.home"))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        send_reset_password_email(user)
+        flash("An email has been sent to your account with password reset instructions.", "info")
+        return redirect(url_for("main.login"))
+
+    return render_template('reset_password_request.html', form=form)
+
+
+@main.route("/reset-password/<token>/", methods=['POST', 'GET'])
+def reset_password_token(token):
+    if current_user.is_authenticated:
+        flash("Already logged in!", "warning")
+        return redirect(url_for("main.home"))
+
+    user = User.verify_reset_password_token(token)
+    if not user:
+        flash("Your token is invalid or has expired", "warning")
+        return redirect(url_for("main.reset_password_request"))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        flash(f'Your password has been updated! You can login now', 'success')
+        return redirect(url_for('main.login'))
+    return render_template('reset_password_token.html', form=form)

@@ -38,7 +38,7 @@
                 <a class="my-btn btn-del" href="{{ url_for('courses.remove_file', course_id=course.id, file_id=file.id) }}">
                     <i class="far fa-times-circle ml-4 mr-1"></i></a>
             {%- endif -%}
-
+            <br>
         {% endfor %}
         <br>
         {% if task.update_time %}

@@ -28,8 +28,9 @@ def create_new_file(file_name, task_id):
 
 
 def save_file(form_file, new_file_name, course_id):
-    file_dir = create_dir(course_id)
-    if not file_dir:
+    course = Course.query.get_or_404(course_id)
+    directory = course.create_directory()
+    if not directory:
         return
 
     # Define file name
@@ -41,9 +42,9 @@ def save_file(form_file, new_file_name, course_id):
     else:
         filename = secrets.token_hex(8)
 
-    filename = same_file_name(file_dir, filename, file_ext)
+    filename = same_file_name(directory, filename, file_ext)
 
-    form_file.save(file_dir + "/" + filename)
+    form_file.save(directory + "/" + filename)
     return filename
 
 
@@ -57,18 +58,3 @@ def same_file_name(file_dir, filename, file_ext):
 
     return f"{filename}{file_ext}" if i == 0 else f"{filename}({i}){file_ext}"
 
-
-def create_dir(course_id):
-    directory = str(course_id)
-    parent_dir = "static/uploads"
-    path = os.path.join(current_app.root_path, parent_dir, directory)
-
-    try:
-        os.mkdir(path)
-    except FileExistsError as error:
-        print(error)
-    except FileNotFoundError as error:
-        print(error)
-        return None
-
-    return path

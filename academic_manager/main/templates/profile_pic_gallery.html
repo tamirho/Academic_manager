@@ -1,21 +1,31 @@
 {% extends "base.html" %}
-    {% block title %}Pic a pic{% endblock %}
+{% block title %}Pic a pic{% endblock %}
 {% block content %}
-<div class="card">
-    <h4 class="card-header">Pic a pic</h4>
-    <div class="card-body">
-        <div class="content-section">
-            
-            <div class="media">
-                <ul>
-                {% for pic_name in gallery_lst %}
-                    <li><img style="height: 125px; width: 125px; margin-right: 20px; margin-bottom: 16px;"
-                             src="{{ pic_name }}" alt="{{ pic_name }}"></li>
 
-                {% endfor %}</ul>
+<h3><i class="fas fa-camera-retro mr-2 fa-lg"></i>Pick a pic</h3>
+<div class="content-section textalign-center">
+    <form action="#" method="POST">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <!-- Images -->
+            <div class="form-group">
+                {% for subfield in form.images %}
+                <div class="form-check form-check-inline">
+                    {{ subfield(class="form-check-input") }}
+                    <img class="rounded-circle view-img mr-4 my-3"
+                         src="{{ url_for('static', filename='profile_pics/default/' + subfield.data) }}">
+
+                </div>
+                {% endfor %}
             </div>
+        </fieldset>
 
+        <!-- Submit -->
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
         </div>
-    </div>
+    </form>
 </div>
+
+
 {% endblock %}

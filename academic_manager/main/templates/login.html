@@ -45,17 +45,16 @@
                     {{ form.remember(class="form-check-input") }}
                     {{ form.remember.label(class="form-check-input-label") }}
                 </div>
+            </fieldset>
+
+            <div class="form-group">
+                <!-- Submit -->
+                {{ form.submit(class="btn btn-outline-info") }}
 
                 <!-- Forgot Password -->
                 <small class="text-muted ml-2">
-                    <a href="#">Forgot Password?</a>
+                    <a href="{{ url_for('main.reset_password_request') }}">Forgot Password?</a>
                 </small>
-
-            </fieldset>
-
-            <!-- Submit -->
-            <div class="form-group">
-                    {{ form.submit(class="btn btn-outline-info") }}
             </div>
 
         </form>

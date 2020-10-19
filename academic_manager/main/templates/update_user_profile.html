@@ -11,6 +11,7 @@
             <fieldset class="form-group">
 
                 <div class="row">
+
                     <!-- First Name -->
                     <div class="form-group col">
                         {{ form.first_name.label(class="form-control-label") }}
@@ -64,7 +65,7 @@
                     {{ form.picture(class="form-control-file  form-control-sm") }}
                     {% if form.picture.errors %}
                             {% for error in form.picture.errors %}
-                                <span class="text-danger">{{ error }}</span></br>
+                                <span class="text-danger">{{ error }}</span><br>
                             {% endfor %}
                     {% endif %}
                 </div>

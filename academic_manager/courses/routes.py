@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request, session, flash, Blueprint, abort
+from flask import redirect, url_for, render_template, request, session, flash, Blueprint, abort
 from academic_manager.extensions import restricted
 from flask_login import current_user, login_required
 from academic_manager.courses.forms import CourseForm, TaskForm

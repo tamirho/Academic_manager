@@ -1,5 +1,6 @@
 import os
 from flask import current_app
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from academic_manager.extensions import db, login_manager
 from datetime import datetime
 from flask_login import UserMixin
@@ -57,6 +58,19 @@ class User(db.Model, UserMixin):
     def update_last_seen(self):
         self.last_seen = datetime.now()
         db.session.commit()
+
+    def get_reset_password_token(self, expires_sec=1800):
+        ser = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        return ser.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        ser = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = ser.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
 
 class Admin(User):
@@ -173,6 +187,21 @@ class Course(db.Model):
         self.remove_directory()
         db.session.delete(self)
         db.session.commit()
+
+    def create_directory(self):
+        directory = str(self.id)
+        parent_dir = "static/uploads"
+        path = os.path.join(current_app.root_path, parent_dir, directory)
+
+        try:
+            os.mkdir(path)
+        except FileExistsError as error:
+            print(error)
+        except FileNotFoundError as error:
+            print(error)
+            return None
+
+        return path
 
     def remove_directory(self):
         parent_dir = "static/uploads"

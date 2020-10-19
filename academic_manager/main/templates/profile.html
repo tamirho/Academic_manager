@@ -12,8 +12,6 @@
                     <br>{{ user.gender }}, {{ user.role }}
                     <br>Last Seen at {{ user.last_seen.strftime('%H:%M %b %d, %Y') }}</p>
                 {% if current_user==user or current_user.is_admin %}
-                    <a href="#"
-                       class="btn btn-dark btn-sm"><i class="fas fa-key mr-2"></i>Change Password</a>
                     <a href="{{ url_for('main.update_user_profile', user_id=user.id) }}"
                        class="btn btn-success btn-sm"><i class="fas fa-pencil-alt mr-2"></i>Update</a>
 
@@ -21,6 +19,9 @@
                     <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">
                         <i class="fas fa-trash-alt mr-2"></i>Delete</button>
 
+                <p>
+                    <a href="{{ url_for('main.profile_picture_gallery') }}"><i class="fas fa-camera-retro mr-2 mt-5"></i>You can take a look at our default profile pictures</a>
+                </p>
                 {% endif %}
             </div>
         </div>

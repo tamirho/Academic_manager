@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Admin Page{% endblock %}
 {% block content %}
-
+<a href="{{ url_for('main.main_db_init') }}" class="btn btn-danger"><i class="fas fa-database mr-2"></i>db init</a>
+<br>
+<br>
 <div class="card">
-    <a href="{{ url_for('main.main_db_init') }}" class="btn btn-primary">db init</a>
     <h5 class="card-header">Student</h5>
     <div class="card-body">
         <table style="width:100%">

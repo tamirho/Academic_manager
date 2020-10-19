@@ -13,8 +13,6 @@
                     <br>Last Seen at {{ teacher.last_seen.strftime('%H:%M %b %d, %Y') }}</p>
 
                 {% if current_user.is_admin %}
-                <a href="#"
-                   class="btn btn-dark btn-sm"><i class="fas fa-key mr-2"></i>Change Password</a>
                 <a href="{{ url_for('main.update_user_profile', user_id=teacher.id) }}"
                    class="btn btn-success btn-sm"><i class="fas fa-pencil-alt mr-2"></i>Update</a>
 
