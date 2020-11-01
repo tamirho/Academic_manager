@@ -92,7 +92,6 @@ def profile(user_id):
     return render_template('profile.html', user=user, image_file=image_file)
 
 
-# todo fix the problem when admin update other users
 @main.route("/update/<int:user_id>/", methods=['POST', 'GET'])
 @restricted(role=["admin", "current_user"])
 def update_user_profile(user_id):
