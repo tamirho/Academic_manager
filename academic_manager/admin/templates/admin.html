@@ -36,74 +36,66 @@
 <br>
 <div class="card">
     <h5 class="card-header">Teacher</h5>
-    <table style="width:100%">
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Gender</th>
-            <th colspan="2">Approval</th>
-            <th>Action</th>
-        </tr>
+    <div class="card-body">
+        <table style="width:100%">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Approval</th>
+                <th>Action</th>
+            </tr>
 
-        {% for teacher in teacher_list %}
-        <tr>
-            <td>{{ teacher.full_name }}</td>
-            <td>{{ teacher.email }}</td>
-            <td>{{ teacher.gender }}</td>
-            <td>
-                {% if teacher.approved %}
-                True
-                {% else %}
-                False
-                {% endif %}
-            </td>
-
-            <td>
-                {% if teacher.approved %}
-                <a href="{{ url_for('admin.teacher_approval', user_id=teacher.id, action='disapprove') }}"
-                   class="badge badge-warning">Disapprove</a>
-                {% else %}
-                <a href="{{ url_for('admin.teacher_approval' ,user_id=teacher.id, action='approve') }}"
-                   class="badge badge-info">Approve</a>
-                {% endif %}
-            </td>
-            <td>
-                <a href="{{ url_for('teachers.watch_teacher', user_id=teacher.id) }}"
-                   class="badge badge-primary">Watch</a>
-                <a href="{{ url_for('main.update_user_profile', user_id=teacher.id) }}"
-                   class="badge badge-success">Update</a>
-                <a href="{{ url_for('main.delete_user', user_id=teacher.id) }}"
-                   class="badge badge-danger">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+            {% for teacher in teacher_list %}
+            <tr>
+                <td>{{ teacher.full_name }}</td>
+                <td>{{ teacher.email }}</td>
+                <td>{{ teacher.gender }}</td>
+                <td>
+                    {% if teacher.approved %}
+                    <a href="{{ url_for('admin.teacher_approval', user_id=teacher.id, action='disapprove') }}"
+                       class="badge badge-warning">Disapprove</a>
+                    {% else %}
+                    <a href="{{ url_for('admin.teacher_approval' ,user_id=teacher.id, action='approve') }}"
+                       class="badge badge-info">Approve</a>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('teachers.watch_teacher', user_id=teacher.id) }}"
+                       class="badge badge-primary">Watch</a>
+                    <a href="{{ url_for('main.update_user_profile', user_id=teacher.id) }}"
+                       class="badge badge-success">Update</a>
+                    <a href="{{ url_for('main.delete_user', user_id=teacher.id) }}"
+                       class="badge badge-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 <br>
 <div class="card">
     <h5 class="card-header">Courses</h5>
-    <table style="width:100%">
-        <tr>
-            <th>Course Name</th>
-            <th>Teacher</th>
-            <th>Students</th>
-        </tr>
+    <div class="card-body">
+        <table style="width:100%">
+            <tr>
+                <th>Course Name</th>
+                <th>Teacher</th>
+                <th>Students</th>
+                <th>Action</th>
+            </tr>
 
-        {% for course in courses_list %}
-        <tr>
-            <td>{{ course.course_name }}</td>
-            <td>{{ course.lecturer.full_name }}</td>
-            <td>{% for enroll in course.enrollment %}
-                {% if loop.index % 4 == 0 %}
-                <br/>
-                {% endif %}
-                ({{ loop.index}}) {{ enroll.student.full_name }}
+            {% for course in courses_list %}
+            <tr>
+                <td>{{ course.course_name }}</td>
+                <td>{{ course.lecturer.full_name }}</td>
+                <td>{{ course.enrollment|length }}</td>
+                <td><a href="{{ url_for('courses.course_dashboard', course_id=course.id) }}"
+                       class="badge badge-info">Dashboard</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
 
-                {% endfor %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-</div>
 {% endblock %}

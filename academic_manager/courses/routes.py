@@ -49,7 +49,6 @@ def delete_course(course_id):
     return redirect(request.referrer)
 
 
-# todo this
 @courses.route("/dashboard/<int:course_id>/")
 @courses.route("/dashboard/<int:course_id>/main/")
 @login_required
@@ -144,7 +143,6 @@ def dashboard_edit_task(course_id, task_id):
                            page_name="Edit Task")
 
 
-# todo this
 @courses.route("/dashboard/<int:course_id>/view-tasks/")
 @login_required
 def dashboard_view_tasks(course_id):
@@ -194,6 +192,7 @@ def dashboard_update_grades(course_id):
 def remove_file(course_id, file_id):
     current_course = Course.query.get_or_404(course_id)
     file = File.query.get_or_404(file_id)
+
     # Prevents teachers who do not teach the course from remove files
     if current_user.is_teacher and current_course.lecturer != current_user:
         abort(403)
@@ -202,48 +201,3 @@ def remove_file(course_id, file_id):
     file.delete_from_db()
     flash(f"{file_name} has been deleted", "success")
     return redirect(request.referrer)
-
-
-"""
-@courses.route("/<int:course_id>/course_control/", methods=['POST', 'GET'])
-@restricted(role=["admin", "teacher"])
-def course_dashboard_teacher(course_id):
-    current_course = Course.query.get(course_id)
-    tasks = Task.query.filter_by(course_id=course_id).order_by(Task.date_posted.desc()).all()
-    best_student = get_best_student(course_id)
-
-    return render_template("dashboard_view_tasks.html", course=current_course, tasks=tasks,
-                           best_student=best_student)
-
-
-
-    # Prevents teachers who do not teach the course get inside
-    if current_user.is_teacher and current_course.lecturer != current_user:
-        abort(403)
-
-    if request.method == "POST":
-        pass  # todo edith later
-
-    return render_template("course_dashboard_teacher.html", course=current_course, tasks=tasks,
-                           best_student=best_student)
-
-
-
-@courses.route("/<int:course_id>/dashboard/<int:user_id>", methods=['POST', 'GET'])
-@restricted(role=["student"])
-def course_dashboard_student(course_id, user_id):
-    if request.method == "POST":
-        pass  # todo edith later
-    else:
-        current_course = Course.query.get(course_id)
-        tasks = Task.query.filter_by(course_id=course_id).order_by(Task.date_posted.desc()).all()
-        best_student = get_best_student(course_id)
-        # student = Student.query.get(student_id)
-
-        # return render_template("course_dashboard_student.html", course=current_course,
-        #                               tasks=tasks, best_student=best_student)
-
-        return render_template("dashboard_view_tasks.html", course=current_course,
-                               tasks=tasks, best_student=best_student)
-                               
-"""

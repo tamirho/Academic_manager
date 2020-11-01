@@ -51,28 +51,3 @@
 
 {% endblock dashboard %}
 
-
-<!--
-
-
-    {% for enroll in course.enrollment %}
-    {% set student = enroll.student %}
-    <tr>
-        <td scope="row">{{ loop.index }}</td>
-        <td scope="row">
-            <a href="{{ url_for('students.watch_student', user_id=student.id)
-                                if current_user.is_admin or current_user.is_teacher
-                                else url_for('main.profile', user_id=student.id)}}">
-                {{ student.full_name }}</a>
-        </td>
-        <td scope="row">{{ enroll.grade if enroll.grade else "-" }}</td>
-        <td scope="row">
-            {{ form.content(class="form-control") }}
-        </td>
-    </tr>
-    {% endfor %}
-
-
-
-
--->
